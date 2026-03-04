@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Dexterous Manipulation Actually Needs — Shreya Kalyanaraman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b10;--surface:#0c1219;--surface2:#101922;--border:#1a2535;--border-hi:#243448;--gold:#d4a853;--violet:#a78bfa;--rose:#f9a8d4;--sky:#7dd3fc;--green:#6ee7b7;--text:#7a9ab5;--text-lo:#2a3f55;--text-hi:#c8dff0;--mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--serif:'DM Serif Display',serif;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.8;overflow-x:hidden;cursor:none;font-size:16px;}
+#cur{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .1s;}
+#cur-ring{width:32px;height:32px;border:1px solid rgba(212,168,83,.28);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:left .12s ease,top .12s ease;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(212,168,83,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,.012) 1px,transparent 1px);background-size:48px 48px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:54px;padding:0 52px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,11,16,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--mono);font-size:13px;color:var(--gold);text-decoration:none;letter-spacing:.05em;}
+.logo em{color:var(--text-lo);font-style:normal;}
+.nav-back{font-family:var(--mono);font-size:11px;color:var(--text-lo);text-decoration:none;letter-spacing:.1em;transition:color .15s;}
+.nav-back:hover{color:var(--gold);}
+.article-wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:110px 40px 100px;}
+.art-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.art-kicker::before{content:'──';color:var(--text-lo);}
+.art-title{font-family:var(--serif);font-size:clamp(28px,5vw,44px);color:var(--text-hi);line-height:1.12;letter-spacing:-.01em;margin-bottom:24px;font-weight:400;}
+.art-meta{display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:var(--text-lo);margin-bottom:48px;flex-wrap:wrap;}
+.art-hr{width:100%;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:52px;}
+.prose p{font-size:16px;color:var(--text);line-height:1.85;margin-bottom:24px;font-weight:300;}
+.prose h2{font-family:var(--serif);font-size:26px;color:var(--text-hi);margin:52px 0 18px;font-weight:400;}
+.prose h3{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:36px 0 14px;}
+.prose strong{color:var(--text-hi);font-weight:500;}
+.prose em{font-style:italic;color:var(--text-hi);}
+.prose a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,168,83,.3);transition:border-color .15s;}
+.prose a:hover{border-color:var(--gold);}
+.prose ul{list-style:none;margin:0 0 24px;display:flex;flex-direction:column;gap:10px;}
+.prose ul li{padding-left:22px;position:relative;font-size:15px;color:var(--text);line-height:1.75;font-weight:300;}
+.prose ul li::before{content:'→';position:absolute;left:0;color:var(--gold);font-family:var(--mono);font-size:12px;top:3px;}
+.prose blockquote{margin:32px 0;padding:16px 22px;border-left:2px solid var(--gold);background:rgba(212,168,83,.05);font-family:var(--mono);font-size:13px;color:var(--gold);line-height:1.7;}
+.callout{padding:18px 22px;border:1px solid var(--border-hi);background:var(--surface);margin:32px 0;font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.7;}
+.callout .cl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.chip{font-family:var(--mono);font-size:10px;padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid var(--border-hi);color:var(--text-lo);display:inline-block;margin:2px;}
+.post-nav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-top:80px;}
+.pn-item{background:var(--surface);padding:22px 26px;text-decoration:none;transition:background .2s;}
+.pn-item:hover{background:var(--surface2);}
+.pn-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-lo);margin-bottom:8px;}
+.pn-title{font-family:var(--sans);font-size:14px;color:var(--text-hi);line-height:1.35;font-weight:400;}
+.pn-item.right{text-align:right;}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 52px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-lo);}
+@media(max-width:700px){nav{padding:0 18px;}.article-wrap{padding:90px 20px 60px;}footer{padding:16px 20px;flex-direction:column;gap:8px;}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<nav>
+  <a class="logo" href="../index.html"><em>~/</em>shreya-k</a>
+  <a class="nav-back" href="../index.html#blog">← Back to site</a>
+</nav>
+
+<div class="article-wrap">
+  <div class="art-kicker">Opinion · Dexterous Manipulation · VLA Systems</div>
+  <h1 class="art-title">What Dexterous Manipulation Actually Needs — and Why VLAs Alone Aren't Enough</h1>
+  <div class="art-meta">
+    <span>2025</span>
+    <span>Shreya Kalyanaraman</span>
+    <span>~7 min read</span>
+  </div>
+  <div class="art-hr"></div>
+
+  <div class="prose">
+
+    <p>I've spent the last year deploying foundation models on real robots. And I want to be honest about what that experience has made me believe: <strong>VLAs are impressive, brittle in specific ways, and missing something important for dexterous manipulation.</strong></p>
+    <p>This isn't a critique of the field — I think VLA models represent a genuine leap. But the gap between benchmark performance and reliable real-world deployment is real, and I don't think it closes by just scaling data and parameters.</p>
+
+    <h2>What VLAs Are Actually Good At</h2>
+    <p>Foundation model VLAs like π₀ and OpenVLA are good at the <em>semantic</em> layer of manipulation — understanding what needs to happen from language and visual context, and generating plausible action sequences for tasks they've seen variants of in training.</p>
+    <p>When I deployed π₀-Fast on the UR3e for grocery bagging and table bussing, it worked. 88% success. Under 6ms inference. That's real. The model has learned something genuinely useful about how to execute household manipulation tasks.</p>
+
+    <h2>Where They Break Down</h2>
+    <p>The failures cluster in a specific place: <strong>contact-rich tasks under uncertainty.</strong></p>
+    <p>Dexterous manipulation — actually grasping objects with multi-finger hands, maintaining appropriate contact forces, adapting to unexpected object geometry — requires information that RGB images don't fully provide. Object pose is partially occluded. Contact state is invisible. Surface properties are ambiguous.</p>
+    <p>A VLA trained on imitation data treats these as solved by the demonstration. The policy implicitly learned whatever the demonstrator did in these situations. But the demonstrator had proprioception, tactile feedback, and intuitions built from years of physical experience that don't live in the video.</p>
+
+    <blockquote>
+      The policy learned the distribution of demonstrated behavior. It did not learn why those behaviors work — which is exactly what you need when you encounter a new object, a partial occlusion, or an unexpected contact.
+    </blockquote>
+
+    <h2>The Missing Ingredient: Explicit Uncertainty</h2>
+    <p>My research on variational grasping is motivated by this gap. Rather than committing to a single grasp prediction, a probabilistic approach maintains a <strong>distribution over possible grasps</strong> — explicitly representing what the model doesn't know about object pose, contact geometry, and expected success.</p>
+    <p>This matters for several reasons:</p>
+    <ul>
+      <li><strong>Calibrated failure prediction</strong> — a model that knows it's uncertain can ask for more information, attempt multiple strategies, or alert a human, rather than confidently executing a bad plan</li>
+      <li><strong>Robustness to sensor noise</strong> — when the depth sensor gives noisy data or the object is partially occluded, uncertainty propagates through the system rather than being silently ignored</li>
+      <li><strong>Cross-object generalization</strong> — a distribution over grasps generalizes to novel object geometries more gracefully than a point estimate trained on seen objects</li>
+    </ul>
+
+    <h2>The Language Problem Is Related</h2>
+    <p>The TMI project I worked on reveals a closely related issue at the language layer. OpenVLA success drops from 69% to 17.5% when instructions become naturally noisy — same goal, different words.</p>
+    <p>This failure mode and the contact-uncertainty failure mode have the same root cause: <strong>the model's generalization is surface-level.</strong> It learned associations between specific input patterns and specific output patterns. When the input varies in ways that don't change the underlying task, the output breaks anyway.</p>
+    <p>Real-world deployment means constant distribution shift — different objects, different lighting, different user phrasing, different surface textures. A system that can't represent and reason about that variation explicitly will always be fragile.</p>
+
+    <h2>What Would Actually Help</h2>
+    <p>I'm not arguing against VLAs — I'm arguing for what they need to become more robust:</p>
+    <ul>
+      <li><strong>Multimodal sensing at the contact layer</strong> — tactile sensors like Anyskin change what's observable. The RAAS Lab's work on integrating tactile feedback into manipulation pipelines is the right direction.</li>
+      <li><strong>Explicit uncertainty representation</strong> — variational or diffusion-based approaches that don't collapse the distribution prematurely. Diffusion Policy gets part of this right; it samples from a distribution rather than predicting a point action.</li>
+      <li><strong>Semantic robustness at the language layer</strong> — whether through instruction preprocessing (as we showed in TMI) or fine-tuning on realistic diverse instruction data.</li>
+      <li><strong>Better evaluation</strong> — benchmark success rates hide the distribution of failures. A model that succeeds 85% of the time but fails catastrophically (damaging the object or the robot) on the remaining 15% is not deployment-ready.</li>
+    </ul>
+
+    <div class="callout">
+      <div class="cl">Where I Think This Goes</div>
+      The systems that will actually work in unstructured real-world environments will combine the semantic power of foundation models with explicit uncertainty quantification at the perception and action layers, and real tactile feedback at the contact layer. None of these is sufficient alone.
+    </div>
+
+    <p>I'm working on part of this with the variational grasping research. But I think the field needs to be honest that current VLAs, as impressive as they are, are not yet the answer for robust dexterous manipulation in unconstrained settings. That's not a reason to be pessimistic — it's a reason to be specific about where the open problems actually are.</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:36px">
+      <span class="chip">VLA Systems</span><span class="chip">Dexterous Manipulation</span><span class="chip">Uncertainty Quantification</span><span class="chip">Variational Inference</span><span class="chip">Tactile Sensing</span>
+    </div>
+  </div>
+
+  <nav class="post-nav">
+    <a class="pn-item" href="flashattention.html">
+      <div class="pn-label">← Previous</div>
+      <div class="pn-title">FlashAttention: Why Exact Attention Was Always Possible, Just Slow</div>
+    </a>
+    <a class="pn-item right" href="tmi.html">
+      <div class="pn-label">Related →</div>
+      <div class="pn-title">TMI: Teaching OpenVLA to Ignore the Fluff</div>
+    </a>
+  </nav>
+</div>
+
+<footer>
+  <span>© 2025 Shreya Kalyanaraman</span>
+  <a href="../index.html" style="color:var(--gold);text-decoration:none;">← Back to portfolio</a>
+</footer>
+
+<script>
+const c=document.getElementById('cur'),r=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.left=mx-4+'px';c.style.top=my-4+'px';});
+(function l(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx-16+'px';r.style.top=ry-16+'px';requestAnimationFrame(l);})();
+document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{c.style.transform='scale(2.5)';r.style.borderColor='rgba(212,168,83,.65)';});el.addEventListener('mouseleave',()=>{c.style.transform='scale(1)';r.style.borderColor='rgba(212,168,83,.28)';});});
+</script>
+</body>
+</html>

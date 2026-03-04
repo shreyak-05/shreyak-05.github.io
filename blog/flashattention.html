@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashAttention — Shreya Kalyanaraman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b10;--surface:#0c1219;--surface2:#101922;--border:#1a2535;--border-hi:#243448;--gold:#d4a853;--violet:#a78bfa;--rose:#f9a8d4;--sky:#7dd3fc;--green:#6ee7b7;--text:#7a9ab5;--text-lo:#2a3f55;--text-hi:#c8dff0;--mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--serif:'DM Serif Display',serif;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.8;overflow-x:hidden;cursor:none;font-size:16px;}
+#cur{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .1s;}
+#cur-ring{width:32px;height:32px;border:1px solid rgba(212,168,83,.28);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:left .12s ease,top .12s ease;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(212,168,83,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,.012) 1px,transparent 1px);background-size:48px 48px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:54px;padding:0 52px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,11,16,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--mono);font-size:13px;color:var(--gold);text-decoration:none;letter-spacing:.05em;}
+.logo em{color:var(--text-lo);font-style:normal;}
+.nav-back{font-family:var(--mono);font-size:11px;color:var(--text-lo);text-decoration:none;letter-spacing:.1em;transition:color .15s;}
+.nav-back:hover{color:var(--gold);}
+.article-wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:110px 40px 100px;}
+.art-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.art-kicker::before{content:'──';color:var(--text-lo);}
+.art-title{font-family:var(--serif);font-size:clamp(30px,5vw,46px);color:var(--text-hi);line-height:1.12;letter-spacing:-.01em;margin-bottom:24px;font-weight:400;}
+.art-meta{display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:var(--text-lo);margin-bottom:48px;flex-wrap:wrap;}
+.art-hr{width:100%;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:52px;}
+.prose p{font-size:16px;color:var(--text);line-height:1.85;margin-bottom:24px;font-weight:300;}
+.prose h2{font-family:var(--serif);font-size:26px;color:var(--text-hi);margin:52px 0 18px;font-weight:400;}
+.prose h3{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:36px 0 14px;}
+.prose strong{color:var(--text-hi);font-weight:500;}
+.prose em{font-style:italic;color:var(--text-hi);}
+.prose a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,168,83,.3);transition:border-color .15s;}
+.prose a:hover{border-color:var(--gold);}
+.prose ul{list-style:none;margin:0 0 24px;display:flex;flex-direction:column;gap:10px;}
+.prose ul li{padding-left:22px;position:relative;font-size:15px;color:var(--text);line-height:1.75;font-weight:300;}
+.prose ul li::before{content:'→';position:absolute;left:0;color:var(--gold);font-family:var(--mono);font-size:12px;top:3px;}
+.prose code{font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--sky);padding:2px 7px;border:1px solid var(--border-hi);}
+.callout{padding:18px 22px;border:1px solid var(--border-hi);background:var(--surface);margin:32px 0;font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.7;}
+.callout .cl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.chip{font-family:var(--mono);font-size:10px;padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid var(--border-hi);color:var(--text-lo);display:inline-block;margin:2px;}
+
+/* Memory diagram */
+.mem-diagram{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--border-hi);padding:24px;margin:32px 0;font-family:var(--mono);font-size:12px;}
+.mem-row{display:flex;align-items:center;gap:14px;}
+.mem-label{width:60px;color:var(--text-lo);flex-shrink:0;font-size:11px;}
+.mem-bar{height:28px;display:flex;align-items:center;padding:0 12px;font-size:11px;letter-spacing:.05em;}
+.mem-sram{background:rgba(110,231,183,.1);border:1px solid rgba(110,231,183,.3);color:var(--green);width:30%;}
+.mem-hbm{background:rgba(249,168,212,.06);border:1px solid rgba(249,168,212,.2);color:var(--rose);width:100%;}
+.mem-note{font-size:10px;color:var(--text-lo);margin-top:8px;}
+
+.post-nav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-top:80px;}
+.pn-item{background:var(--surface);padding:22px 26px;text-decoration:none;transition:background .2s;}
+.pn-item:hover{background:var(--surface2);}
+.pn-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-lo);margin-bottom:8px;}
+.pn-title{font-family:var(--sans);font-size:14px;color:var(--text-hi);line-height:1.35;font-weight:400;}
+.pn-item.next{text-align:right;}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 52px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-lo);}
+@media(max-width:700px){nav{padding:0 18px;}.article-wrap{padding:90px 20px 60px;}footer{padding:16px 20px;flex-direction:column;gap:8px;}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<nav>
+  <a class="logo" href="../index.html"><em>~/</em>shreya-k</a>
+  <a class="nav-back" href="../index.html#blog">← Back to site</a>
+</nav>
+
+<div class="article-wrap">
+  <div class="art-kicker">Paper Review · CMSC 848K</div>
+  <h1 class="art-title">FlashAttention: Why Exact Attention Was Always Possible, Just Slow</h1>
+  <div class="art-meta">
+    <span>2025</span>
+    <span>Shreya Kalyanaraman</span>
+    <span>~6 min read</span>
+    <span>Dao et al., 2022</span>
+  </div>
+  <div class="art-hr"></div>
+
+  <div class="prose">
+
+    <h2>The Important Clarification Up Front</h2>
+    <p>FlashAttention does <strong>not</strong> approximate attention. The outputs are numerically identical to standard attention. What it changes is <em>how</em> the computation is performed — specifically, how it interacts with GPU memory hierarchy.</p>
+    <p>This distinction matters. A lot of efficient attention work trades accuracy for speed. FlashAttention trades nothing — it just stops wasting time reading and writing to the wrong memory.</p>
+
+    <h2>The Problem: IO is the Bottleneck</h2>
+    <p>Modern GPUs have two main memory tiers: fast on-chip SRAM (small, ~20MB, very fast) and slower off-chip HBM — High Bandwidth Memory (large, ~40–80GB, slower to access).</p>
+    <p>Standard attention materializes the full N×N attention matrix in HBM — that's a lot of data to write and read back. The key insight from Dao et al. is that <strong>computation time is much smaller than IO time</strong>. The attention matrix itself isn't slow to compute; it's slow to move.</p>
+
+    <div class="mem-diagram">
+      <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">GPU Memory Hierarchy</div>
+      <div class="mem-row">
+        <div class="mem-label">SRAM</div>
+        <div class="mem-bar mem-sram">~20MB · very fast · on-chip</div>
+      </div>
+      <div class="mem-row">
+        <div class="mem-label">HBM</div>
+        <div class="mem-bar mem-hbm">~40–80GB · slower · off-chip</div>
+      </div>
+      <div class="mem-note">Standard attention reads/writes the N×N matrix to HBM. FlashAttention keeps it in SRAM.</div>
+    </div>
+
+    <h2>The Solution: Tiling + Recomputation</h2>
+    <h3>Tiling</h3>
+    <p>Instead of computing the full attention matrix at once, FlashAttention splits Q, K, and V into smaller blocks that fit in SRAM. It computes attention incrementally per block — and critically, uses a <strong>numerically stable running softmax</strong> to accumulate results without ever materializing the full N×N matrix in HBM.</p>
+    <p>The running softmax is the clever part. Standard softmax needs all the values first. FlashAttention maintains running statistics (max value and normalizer) that get updated as each block is processed, allowing the correct result to be computed in a single pass.</p>
+
+    <h3>Recomputation</h3>
+    <p>Standard attention stores intermediate activations for the backward pass — that's where a lot of HBM writes come from. FlashAttention instead <strong>recomputes</strong> the attention matrix during the backward pass rather than storing it. Recomputation is cheap (it's just arithmetic); storing and loading from HBM is expensive.</p>
+    <p>This trades compute for memory access — a great deal when compute is faster than IO.</p>
+
+    <h3>Kernel Fusion</h3>
+    <p>FlashAttention also fuses multiple operations into a single CUDA kernel. If several operations act on the same input, the input can be loaded once from HBM instead of once per operation. Fewer HBM accesses means faster execution.</p>
+
+    <div class="callout">
+      <div class="cl">The Core Insight</div>
+      Standard attention is bottlenecked by memory bandwidth, not computation. FlashAttention reorganizes the same operations to minimize HBM access — same math, dramatically fewer trips to slow memory.
+    </div>
+
+    <h2>What I Found Most Interesting</h2>
+    <p>The result I keep thinking about: <strong>attention cannot surpass matrix multiplication in memory traffic — it can only become equal to it.</strong> Matrix multiplication is already hardware-optimal in its memory access patterns. FlashAttention is essentially the proof that attention was always capable of reaching that same level; it just needed better implementation.</p>
+    <p>That's a satisfying kind of result. It means the theoretical ceiling for attention efficiency is well-defined, and FlashAttention is close to it.</p>
+
+    <h2>Relevance to Robot Learning</h2>
+    <p>For the VLA models I work with — OpenVLA, π₀ — this matters practically. These models process images as long token sequences (SigLIP patches), and longer context means more attention cost. FlashAttention is what makes real-time inference feasible at scale.</p>
+    <p>The sub-6ms inference I achieved with π₀-Fast on the UR3e isn't just a model architecture story — it's also a systems story. IO-aware attention is part of what makes foundation model deployment on real hardware possible.</p>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>Requires custom CUDA kernels — complex to implement, less accessible to researchers without systems expertise</li>
+      <li>Block size tuning is hardware-specific; optimal configurations vary across GPU architectures</li>
+      <li>Attention is still O(N²) in compute — FlashAttention is IO-efficient, not compute-efficient. For very long sequences, approximate methods may still be needed</li>
+    </ul>
+
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:36px">
+      <span class="chip">FlashAttention</span><span class="chip">IO-Awareness</span><span class="chip">CUDA Kernels</span><span class="chip">Tiling</span><span class="chip">Recomputation</span><span class="chip">GPU Memory</span>
+    </div>
+  </div>
+
+  <nav class="post-nav">
+    <a class="pn-item" href="attention.html">
+      <div class="pn-label">← Previous</div>
+      <div class="pn-title">Attention is All You Need</div>
+    </a>
+    <a class="pn-item next" href="vla-limits.html">
+      <div class="pn-label">Next →</div>
+      <div class="pn-title">What Dexterous Manipulation Actually Needs</div>
+    </a>
+  </nav>
+</div>
+
+<footer>
+  <span>© 2025 Shreya Kalyanaraman</span>
+  <a href="../index.html" style="color:var(--gold);text-decoration:none;">← Back to portfolio</a>
+</footer>
+
+<script>
+const c=document.getElementById('cur'),r=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.left=mx-4+'px';c.style.top=my-4+'px';});
+(function l(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx-16+'px';r.style.top=ry-16+'px';requestAnimationFrame(l);})();
+document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{c.style.transform='scale(2.5)';r.style.borderColor='rgba(212,168,83,.65)';});el.addEventListener('mouseleave',()=>{c.style.transform='scale(1)';r.style.borderColor='rgba(212,168,83,.28)';});});
+</script>
+</body>
+</html>

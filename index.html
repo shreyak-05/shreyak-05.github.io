@@ -1,130 +1,1654 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shreya's Portfolio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shreya Kalyanaraman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070b10;
+  --surface: #0c1219;
+  --surface2: #101922;
+  --border: #1a2535;
+  --border-hi: #243448;
+  --gold: #d4a853;
+  --gold-dim: rgba(212,168,83,0.1);
+  --gold-mid: rgba(212,168,83,0.22);
+  --violet: #a78bfa;
+  --rose: #f9a8d4;
+  --sky: #7dd3fc;
+  --green: #6ee7b7;
+  --text: #7a9ab5;
+  --text-lo: #2a3f55;
+  --text-hi: #c8dff0;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Space Grotesk', sans-serif;
+}
 
-  <!-- AOS (Animate On Scroll) CSS -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
 
-  <!-- Animista animation -->
-  <style>
-    .slide-in-left {
-      animation: slide-in-left 1s ease-out;
-    }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  line-height: 1.75;
+  overflow-x: hidden;
+  cursor: none;
+}
 
-    @keyframes slide-in-left {
-      0% {
-        transform: translateX(-100%);
-        opacity: 0;
-      }
-      100% {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
+/* ── CURSOR ─────────────────────────────── */
+#cur { width:8px; height:8px; background:var(--gold); border-radius:50%;
+  position:fixed; pointer-events:none; z-index:9999; mix-blend-mode:screen; transition:transform .1s; }
+#cur-ring { width:32px; height:32px; border:1px solid rgba(212,168,83,.28); border-radius:50%;
+  position:fixed; pointer-events:none; z-index:9998; transition:left .12s ease,top .12s ease,transform .12s,border-color .12s; }
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background: #fefefe;
-      color: #333;
-    }
+/* ── ATMOSPHERE ───────────────────────────── */
+/* Grid */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(212,168,83,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,168,83,.018) 1px, transparent 1px);
+  background-size:52px 52px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 40%, black 40%, transparent 100%);
+}
+/* CRT scanlines */
+body::after {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,.028) 2px, rgba(0,0,0,.028) 4px
+  );
+  animation:scanroll 12s linear infinite;
+}
+@keyframes scanroll { to { background-position:0 100px; } }
 
-    header {
-      background-color: #4a90e2;
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
+/* noise texture overlay */
+#noise {
+  position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
 
-    h1 {
-      font-size: 2.5rem;
-      margin: 0;
-    }
+/* ambient glow blobs */
+#glow-a {
+  position:fixed; width:600px; height:600px; border-radius:50%;
+  background:radial-gradient(circle, rgba(212,168,83,.06) 0%, transparent 70%);
+  top:-100px; left:-100px; z-index:0; pointer-events:none;
+  animation:blob-drift 18s ease-in-out infinite alternate;
+}
+#glow-b {
+  position:fixed; width:500px; height:500px; border-radius:50%;
+  background:radial-gradient(circle, rgba(167,139,250,.055) 0%, transparent 70%);
+  bottom:-50px; right:-50px; z-index:0; pointer-events:none;
+  animation:blob-drift 22s ease-in-out infinite alternate-reverse;
+}
+@keyframes blob-drift {
+  0%   { transform:translate(0,0) scale(1); }
+  50%  { transform:translate(40px,30px) scale(1.08); }
+  100% { transform:translate(-20px,50px) scale(.95); }
+}
 
-    .content {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
+#particles { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.55; }
 
-    .project, .tool {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      margin-bottom: 1.5rem;
-      padding: 1rem 1.5rem;
-    }
+/* ── GLITCH NAME ─────────────────────────── */
+@keyframes glitch-1 {
+  0%,94%,100% { clip-path:inset(0 0 100% 0); transform:translate(0); }
+  95%  { clip-path:inset(20% 0 60% 0); transform:translate(-3px, 1px); }
+  96%  { clip-path:inset(50% 0 30% 0); transform:translate(3px,-1px); }
+  97%  { clip-path:inset(70% 0 10% 0); transform:translate(-2px, 2px); }
+}
+@keyframes glitch-2 {
+  0%,96%,100% { clip-path:inset(0 0 100% 0); transform:translate(0); }
+  97%  { clip-path:inset(10% 0 70% 0); transform:translate(3px, 0); }
+  98%  { clip-path:inset(40% 0 40% 0); transform:translate(-3px, 1px); }
+  99%  { clip-path:inset(65% 0 20% 0); transform:translate(2px,-2px); }
+}
+.hero-name-wrap { position:relative; display:inline-block; }
+.hero-name-wrap .glitch-a,
+.hero-name-wrap .glitch-b {
+  position:absolute; inset:0; pointer-events:none; user-select:none;
+  font-family:var(--sans); font-weight:700;
+  font-size:clamp(58px,8.5vw,106px); line-height:.88; letter-spacing:-.04em;
+  color:var(--text-hi);
+}
+.hero-name-wrap .glitch-a {
+  color:var(--violet); animation:glitch-1 6s steps(1) infinite;
+  left:2px;
+}
+.hero-name-wrap .glitch-b {
+  color:var(--gold); animation:glitch-2 6s steps(1) infinite;
+  left:-2px;
+}
 
-    .project h2, .tool h3 {
-      color: #4a90e2;
-      margin-top: 0;
-    }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      color: #aaa;
-      font-size: 0.9rem;
-    }
 
-    a {
-      color: #4a90e2;
-      text-decoration: none;
-    }
+/* ── BOOT SCREEN ─────────────────────────── */
+#boot {
+  position:fixed; inset:0; background:var(--bg); z-index:9990;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:52px 60px; gap:0; font-size:13px; line-height:2.2;
+}
+.bl { opacity:0; white-space:nowrap; overflow:hidden; }
+.bl.c-dim  { color:var(--text-lo); }
+.bl.c-gold { color:var(--gold); }
+.bl.c-green{ color:var(--green); }
+.bl.c-sky  { color:var(--sky); }
+.bl.c-hi   { color:var(--text-hi); }
+.bl.c-warn { color:var(--rose); }
 
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+/* ── NAV ─────────────────────────────────── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  height:54px; padding:0 52px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(7,11,16,.93); backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+}
+.logo { font-size:13px; color:var(--gold); letter-spacing:.05em; text-decoration:none; }
+.logo em { color:var(--text-lo); font-style:normal; }
+.nav-links { display:flex; list-style:none; gap:2px; }
+.nav-links a {
+  font-size:10px; color:var(--text-lo); text-decoration:none;
+  letter-spacing:.14em; text-transform:uppercase; padding:5px 12px;
+  transition:color .15s, background .15s;
+}
+.nav-links a:hover, .nav-links a.active { color:var(--gold); background:var(--gold-dim); }
+.nav-status {
+  font-size:10px; color:var(--text-lo); letter-spacing:.08em;
+  display:flex; align-items:center; gap:8px;
+}
+.dot { width:5px; height:5px; background:var(--green); border-radius:50%; animation:blink 1.6s steps(2) infinite; }
+@keyframes blink { 50%{opacity:0} }
+
+/* ── HERO ────────────────────────────────── */
+#hero {
+  min-height:100vh; position:relative; z-index:1;
+  display:grid; grid-template-columns:1fr 440px; align-items:center; gap:48px;
+  padding:130px 60px 60px; max-width:1380px; margin:0 auto;
+}
+
+/* depth layer behind name */
+.hero-left { position:relative; }
+.hero-left::before {
+  content:''; position:absolute;
+  top:-40px; left:-60px; right:0; bottom:-40px;
+  background:radial-gradient(ellipse 60% 55% at 30% 45%, rgba(212,168,83,.07) 0%, transparent 70%);
+  pointer-events:none;
+  animation:hero-pulse 8s ease-in-out infinite;
+}
+@keyframes hero-pulse {
+  0%,100% { opacity:.7; transform:scale(1); }
+  50%      { opacity:1;  transform:scale(1.05); }
+}
+
+.hero-name-wrap {
+  display:block; position:relative;
+  font-family:var(--sans); font-weight:700;
+  font-size:clamp(58px,8.5vw,106px); line-height:.88; letter-spacing:-.04em;
+}
+/* solid is styled below with gradient — don't set plain color here */
+
+.hero-kicker {
+  font-size:10px; letter-spacing:.32em; text-transform:uppercase;
+  color:var(--text-lo); margin-bottom:20px;
+  display:flex; align-items:center; gap:12px; position:relative;
+}
+.hero-kicker::before { content:''; display:block; width:28px; height:1px; background:var(--border-hi); }
+/* small version tag */
+.hero-kicker::after {
+  content:'v2.0'; font-size:9px; letter-spacing:.1em;
+  color:var(--text-lo); padding:1px 6px; border:1px solid var(--border);
+  margin-left:auto;
+}
+
+.hero-name {
+  font-family:var(--sans); font-weight:700;
+  font-size:clamp(58px,8.5vw,106px);
+  color:var(--text-hi); line-height:.88;
+  letter-spacing:-.04em; margin-bottom:0;
+  position:relative;
+}
+/* ghost blur layer for depth */
+.hero-name::before {
+  content:attr(data-name);
+  position:absolute; inset:0;
+  font-family:inherit; font-size:inherit; font-weight:inherit;
+  line-height:inherit; letter-spacing:inherit;
+  color:transparent;
+  text-shadow:0 0 80px rgba(125,211,252,.3);
+  pointer-events:none; user-select:none;
+}
+.hero-name .solid { display:block; }
+.hero-name-wrap .solid {
+  /* iridescent gradient text */
+  background:linear-gradient(135deg, #e8f4fd 0%, #7dd3fc 25%, #a78bfa 50%, #c8dff0 75%, #7dd3fc 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  animation:holo-shift 5s ease infinite;
+  position:relative; z-index:1;
+}
+@keyframes holo-shift {
+  0%   { background-position:0% 50%; }
+  50%  { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
+}
+.hero-name .outline {
+  display:block; color:transparent;
+  -webkit-text-stroke:1.5px rgba(125,211,252,.45);
+  letter-spacing:-.045em;
+  position:relative; top:4px;
+  text-shadow:0 0 40px rgba(125,211,252,.12);
+}
+/* glitch layers match new colour */
+.hero-name-wrap .glitch-a { color:var(--violet); }
+.hero-name-wrap .glitch-b { color:var(--sky); }
+
+/* animated underline accent */
+.hero-accent-line {
+  width:0; height:1px; margin-top:14px; margin-bottom:22px;
+  background:linear-gradient(90deg,var(--gold),var(--violet),transparent);
+  animation:accent-grow 1.2s ease 2.8s forwards;
+}
+@keyframes accent-grow { to { width:200px; } }
+
+.hero-role {
+  font-family:var(--mono); font-size:11px; color:var(--text-lo);
+  margin-bottom:28px; display:flex; align-items:center; gap:0; flex-wrap:wrap;
+}
+.hero-role-item {
+  color:var(--text); padding:4px 12px; border:1px solid var(--border);
+  background:rgba(255,255,255,.018); transition:all .2s; margin:2px;
+}
+.hero-role-item:hover { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
+
+.hero-desc {
+  font-family:var(--sans); font-size:15px; color:var(--text);
+  line-height:1.82; max-width:480px; margin-bottom:36px; font-weight:300;
+}
+.hero-desc strong { color:var(--text-hi); font-weight:600; }
+
+.hero-links { display:flex; gap:8px; flex-wrap:wrap; }
+.btn {
+  font-family:var(--mono); font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; text-decoration:none; padding:11px 22px;
+  transition:all .2s; cursor:none; border:1px solid; position:relative; overflow:hidden;
+}
+.btn::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);
+  transform:translateX(-100%); transition:transform .4s;
+}
+.btn:hover::before { transform:translateX(100%); }
+.btn-primary { background:var(--gold); color:var(--bg); border-color:var(--gold); font-weight:700; }
+.btn-primary:hover { background:var(--text-hi); border-color:var(--text-hi); transform:translateY(-2px); }
+.btn-ghost { background:transparent; color:var(--text); border-color:var(--border-hi); }
+.btn-ghost:hover { color:var(--gold); border-color:var(--gold); background:var(--gold-dim); transform:translateY(-2px); }
+
+/* ── TERMINAL PANEL ──────────────────────── */
+.hero-terminal {
+  position:relative; font-size:12px; line-height:1.9;
+  /* layered box shadows for real depth */
+  box-shadow:
+    0 0 0 1px var(--border-hi),
+    0 4px 6px rgba(0,0,0,.4),
+    0 12px 28px rgba(0,0,0,.5),
+    0 28px 60px rgba(0,0,0,.35),
+    0 0 80px rgba(212,168,83,.07),
+    inset 0 1px 0 rgba(255,255,255,.04);
+  /* subtle tilt for 3d effect */
+  transform:perspective(900px) rotateY(-3deg) rotateX(1deg);
+  transition:transform .5s ease, box-shadow .5s ease;
+}
+.hero-terminal:hover {
+  transform:perspective(900px) rotateY(-1deg) rotateX(.5deg);
+  box-shadow:
+    0 0 0 1px var(--border-hi),
+    0 8px 16px rgba(0,0,0,.45),
+    0 20px 48px rgba(0,0,0,.5),
+    0 40px 80px rgba(0,0,0,.35),
+    0 0 120px rgba(212,168,83,.1),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+/* glass overlay */
+.hero-terminal::before {
+  content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 50%,rgba(0,0,0,.08) 100%);
+  border-radius:inherit;
+}
+/* scanlines */
+.hero-terminal::after {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:4;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.022) 3px,rgba(0,0,0,.022) 4px);
+}
+
+.term-bar {
+  background:linear-gradient(180deg,#1a2535 0%,#131d2a 100%);
+  border-bottom:1px solid rgba(0,0,0,.5);
+  padding:10px 16px; display:flex; align-items:center; gap:10px;
+  position:relative; z-index:5;
+}
+.term-bar::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,168,83,.15),transparent);
+}
+.term-dots { display:flex; gap:6px; }
+.term-dot {
+  width:10px; height:10px; border-radius:50%;
+  box-shadow:0 0 6px currentColor;
+}
+.td-r { background:#ff5f57; color:#ff5f57; }
+.td-y { background:#ffbd2e; color:#ffbd2e; }
+.td-g { background:#28c840; color:#28c840; }
+.term-title { font-size:10px; color:var(--text-lo); letter-spacing:.1em; flex:1; text-align:center; }
+.term-body {
+  padding:18px 20px; min-height:390px; position:relative; z-index:5;
+  background:linear-gradient(180deg,#070b10 0%,#060910 100%);
+}
+
+.tl { display:block; white-space:pre; }
+.tl-dim    { color:var(--text-lo); }
+.tl-gold   { color:var(--gold); }
+.tl-green  { color:var(--green); }
+.tl-sky    { color:var(--sky); }
+.tl-violet { color:var(--violet); }
+.tl-rose   { color:var(--rose); }
+.tl-hi     { color:var(--text-hi); }
+.tl-cmd    { color:var(--text); }
+.prompt    { color:var(--gold); font-weight:700; }
+.term-cursor {
+  display:inline-block; width:7px; height:13px;
+  background:var(--gold); vertical-align:middle;
+  animation:tcursor .9s steps(2) infinite;
+  box-shadow:0 0 8px var(--gold);
+}
+@keyframes tcursor { 50%{opacity:0} }
+
+.hero-meta {
+  grid-column:1/-1;
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:10px; color:var(--text-lo); letter-spacing:.1em;
+  padding-top:20px; border-top:1px solid var(--border);
+}
+.hero-scroll { display:flex; align-items:center; gap:10px; }
+.scroll-line { width:0; height:1px; background:var(--border-hi); animation:grow 1s ease 3s forwards; }
+@keyframes grow { to{width:36px} }
+
+/* ── SECTION WRAPPER ─────────────────────── */
+.section { position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:0 60px 100px; }
+
+.sec-label {
+  font-size:10px; letter-spacing:.25em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:10px; display:flex; align-items:center; gap:8px;
+}
+.sec-label::before { content:'──'; color:var(--text-lo); letter-spacing:-.1em; }
+
+.sec-title {
+  font-family:var(--sans); font-size:clamp(26px,3.5vw,40px);
+  font-weight:600; color:var(--text-hi); line-height:1.1;
+  letter-spacing:-.02em; margin-bottom:52px;
+}
+
+.div { width:100%; height:1px; background:linear-gradient(90deg,transparent,var(--border) 20%,var(--border) 80%,transparent); margin:0 0 100px; position:relative; z-index:1; }
+
+/* ── STATS ROW ───────────────────────────── */
+.stats {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  background:var(--border); border:1px solid var(--border);
+  margin-bottom:72px; position:relative;
+}
+.stat-item {
+  background:var(--surface); padding:28px 32px;
+  position:relative; overflow:hidden; transition:background .25s, transform .25s;
+  cursor:default;
+}
+.stat-item::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.025) 0%,transparent 60%);
+  pointer-events:none;
+}
+/* corner brackets */
+.stat-item::after {
+  content:''; position:absolute; bottom:0; left:0;
+  width:0; height:2px;
+  background:linear-gradient(90deg,var(--sky),var(--violet));
+  transition:width .45s ease;
+}
+.stat-item:hover { background:var(--surface2); transform:translateY(-2px); }
+.stat-item:hover::after { width:100%; }
+/* top-right corner bracket */
+.stat-item .corner-tr {
+  position:absolute; top:8px; right:8px;
+  width:10px; height:10px;
+  border-top:1px solid var(--border-hi); border-right:1px solid var(--border-hi);
+  opacity:0; transition:opacity .25s;
+}
+.stat-item:hover .corner-tr { opacity:1; }
+.stat-n {
+  font-family:var(--sans); font-size:48px; font-weight:700; display:block; line-height:1;
+  background:linear-gradient(135deg,var(--text-hi) 0%,var(--sky) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.stat-l { font-size:10px; color:var(--text-lo); letter-spacing:.15em; text-transform:uppercase; margin-top:8px; }
+
+/* ── PROJECTS ────────────────────────────── */
+.projects-list { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); }
+
+.pc {
+  background:var(--surface);
+  border-left:2px solid transparent;
+  transition:border-color .2s, background .2s;
+  position:relative; overflow:hidden;
+}
+/* glass sheen */
+.pc::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);
+  pointer-events:none;
+}
+.pc:hover, .pc.open { border-left-color:var(--sky); }
+.pc.open {
+  background:linear-gradient(135deg,rgba(125,211,252,.025) 0%,var(--surface2) 100%);
+  box-shadow:inset 0 0 40px rgba(125,211,252,.03);
+}
+
+.pc-header {
+  display:grid; grid-template-columns:56px 1fr auto;
+  align-items:center; gap:20px;
+  padding:24px 28px; cursor:none;
+  user-select:none;
+}
+.pc-num { font-size:11px; color:var(--text-lo); letter-spacing:.1em; }
+.pc-header-main { }
+.pc-type-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+.pc-badge {
+  font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  padding:2px 8px; border:1px solid;
+}
+.pb-research { color:var(--violet); border-color:rgba(167,139,250,.3); }
+.pb-hardware { color:#fb923c; border-color:rgba(251,146,60,.3); }
+.pb-rl       { color:var(--sky); border-color:rgba(125,211,252,.3); }
+.pb-vla      { color:var(--gold); border-color:rgba(212,168,83,.3); }
+.pb-sim      { color:var(--green); border-color:rgba(110,231,183,.3); }
+
+.pc-name {
+  font-family:var(--sans); font-size:17px; font-weight:500;
+  color:var(--text-hi); line-height:1.3;
+}
+.pc-toggle {
+  font-size:18px; color:var(--text-lo); transition:transform .3s, color .2s;
+  width:28px; text-align:center; flex-shrink:0;
+}
+.pc.open .pc-toggle { transform:rotate(45deg); color:var(--gold); }
+
+.pc-body {
+  max-height:0; overflow:hidden;
+  transition:max-height .45s cubic-bezier(.4,0,.2,1);
+  border-top:0px solid var(--border);
+}
+.pc.open .pc-body { max-height:900px; border-top-width:1px; }
+
+.pc-content { padding:28px 28px 28px 84px; display:grid; grid-template-columns:1fr 260px; gap:36px; }
+
+.pc-desc { font-family:var(--sans); font-size:15px; color:var(--text); line-height:1.78; margin-bottom:16px; font-weight:300; }
+.pc-result {
+  font-size:12px; color:var(--gold);
+  padding:10px 14px; border-left:2px solid var(--gold);
+  background:rgba(212,168,83,.05); margin-bottom:20px;
+  font-family:var(--mono);
+}
+.pc-stack { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:20px; }
+.chip {
+  font-size:10px; padding:3px 9px;
+  background:rgba(255,255,255,.02); border:1px solid var(--border-hi);
+  color:var(--text-lo);
+}
+.pc-links { display:flex; gap:14px; flex-wrap:wrap; }
+.pc-links a {
+  font-size:11px; color:var(--text-lo); text-decoration:none;
+  letter-spacing:.08em; transition:color .15s;
+  display:flex; align-items:center; gap:5px;
+}
+.pc-links a:hover { color:var(--gold); }
+
+/* right col */
+.pc-aside { }
+.pc-aside .results-table {
+  width:100%; border-collapse:collapse;
+  font-size:11px; font-family:var(--mono);
+}
+.pc-aside .results-table th {
+  font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--gold); padding:6px 10px; border-bottom:1px solid var(--border-hi); text-align:left;
+}
+.pc-aside .results-table td { padding:6px 10px; border-bottom:1px solid var(--border); color:var(--text-lo); }
+.pc-aside .results-table .win { color:var(--green); }
+.pc-aside .results-table .base { color:var(--rose); }
+.aside-label { font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--text-lo); margin-bottom:10px; }
+
+/* ── EXPERIENCE ──────────────────────────── */
+.exp-list { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); }
+.exp-item {
+  background:var(--surface); padding:32px 36px;
+  display:grid; grid-template-columns:200px 1fr; gap:40px;
+  transition:background .25s, box-shadow .25s; border-left:2px solid transparent;
+  position:relative; overflow:hidden;
+}
+.exp-item::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(125,211,252,.08),transparent);
+  pointer-events:none;
+}
+.exp-item:hover { background:linear-gradient(135deg,rgba(125,211,252,.025) 0%,var(--surface2) 100%); border-left-color:var(--sky); box-shadow:inset 0 0 30px rgba(125,211,252,.03); }
+.exp-date { font-size:11px; color:var(--gold); margin-bottom:6px; }
+.exp-org { font-size:13px; color:var(--text); margin-bottom:3px; }
+.exp-loc { font-size:11px; color:var(--text-lo); }
+.exp-role { font-family:var(--sans); font-size:18px; font-weight:500; color:var(--text-hi); margin-bottom:18px; }
+.exp-bullets { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.exp-bullets li {
+  font-family:var(--sans); font-size:14px; color:var(--text);
+  padding-left:20px; position:relative; line-height:1.68; font-weight:300;
+}
+.exp-bullets li::before { content:'→'; position:absolute; left:0; color:var(--gold); font-family:var(--mono); font-size:12px; top:2px; }
+.exp-stack { display:flex; flex-wrap:wrap; gap:5px; margin-top:16px; }
+
+/* ── PUBLICATIONS ────────────────────────── */
+.pub-list { display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border); }
+.pub-item {
+  background:var(--surface); padding:28px 32px;
+  display:flex; gap:24px; align-items:flex-start;
+  transition:background .25s, box-shadow .25s; border-left:2px solid transparent;
+  position:relative; overflow:hidden;
+}
+.pub-item::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(167,139,250,.1),transparent);
+  pointer-events:none;
+}
+.pub-item:hover { background:linear-gradient(135deg,rgba(167,139,250,.03) 0%,var(--surface2) 100%); border-left-color:var(--violet); box-shadow:inset 0 0 30px rgba(167,139,250,.04); }
+.pub-venue {
+  flex-shrink:0; min-width:80px; font-size:9px; letter-spacing:.1em;
+  text-transform:uppercase; padding:5px 6px; text-align:center; line-height:1.6; border:1px solid;
+}
+.pv-review { color:var(--violet); border-color:rgba(167,139,250,.3); }
+.pv-course  { color:var(--gold); border-color:rgba(212,168,83,.3); }
+.pub-title { font-family:var(--sans); font-size:16px; font-weight:500; color:var(--text-hi); margin-bottom:6px; line-height:1.38; }
+.pub-authors { font-size:12px; color:var(--text-lo); margin-bottom:10px; }
+.pub-authors strong { color:var(--violet); }
+.pub-chips { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+.pub-links { display:flex; gap:14px; }
+.pub-links a { font-size:11px; color:var(--text-lo); text-decoration:none; transition:color .15s; }
+.pub-links a:hover { color:var(--gold); }
+
+/* ── BLOG ────────────────────────────────── */
+.blog-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--border); border:1px solid var(--border); }
+.blog-card {
+  background:var(--surface); padding:36px;
+  display:block; text-decoration:none; position:relative; overflow:hidden;
+  transition:background .25s, box-shadow .25s, transform .25s;
+  border-top:2px solid transparent;
+}
+/* corner brackets */
+.blog-card .bc-tl,.blog-card .bc-br { position:absolute; width:14px; height:14px; pointer-events:none; transition:all .25s; }
+.blog-card .bc-tl { top:12px; left:12px; border-top:1px solid var(--border-hi); border-left:1px solid var(--border-hi); }
+.blog-card .bc-br { bottom:12px; right:12px; border-bottom:1px solid var(--border-hi); border-right:1px solid var(--border-hi); }
+.blog-card:hover {
+  background:linear-gradient(135deg,rgba(125,211,252,.03) 0%,var(--surface2) 100%);
+  border-top-color:var(--sky);
+  box-shadow:inset 0 0 40px rgba(125,211,252,.04);
+  transform:translateY(-1px);
+}
+.blog-card:hover .bc-tl { border-color:var(--sky); width:20px; height:20px; }
+.blog-card:hover .bc-br { border-color:var(--sky); width:20px; height:20px; }
+.blog-meta { display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+.blog-tag {
+  font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  padding:2px 8px; color:var(--violet); border:1px solid rgba(167,139,250,.28);
+}
+.blog-date { font-size:10px; color:var(--text-lo); }
+.blog-read { font-size:10px; color:var(--text-lo); }
+.blog-title { font-family:var(--sans); font-size:19px; font-weight:500; color:var(--text-hi); margin-bottom:12px; line-height:1.3; }
+.blog-excerpt { font-family:var(--sans); font-size:14px; color:var(--text); line-height:1.72; margin-bottom:20px; font-weight:300; }
+.blog-more { font-size:11px; color:var(--gold); display:flex; align-items:center; gap:8px; transition:gap .2s; }
+.blog-card:hover .blog-more { gap:14px; }
+
+/* ── SKILLS ──────────────────────────────── */
+.skills-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border:1px solid var(--border); }
+.skill-col { background:var(--surface); padding:28px 30px; }
+.skill-col-title {
+  font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:22px; padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.skill-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; font-size:12px; color:var(--text); }
+.skill-bar-wrap { flex:1; height:2px; background:var(--border-hi); overflow:hidden; }
+.skill-bar { height:100%; background:linear-gradient(90deg,var(--gold),var(--violet)); width:0%; transition:width 1.2s ease; }
+
+/* ── CONTACT — FULLSCREEN GLITCH TERMINAL ── */
+/* ── CONTACT — FULLSCREEN GLITCH TERMINAL ── */
+
+/* pull contact completely out of the .section box */
+#contact {
+  position:relative; z-index:1;
+  width:100vw;
+  margin-left:calc(-50vw + 50%);
+  padding:0 clamp(24px, 6vw, 120px) 100px;
+  overflow:hidden;
+}
+/* big scanline wash */
+#contact::before {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(125,211,252,.008) 3px, rgba(125,211,252,.008) 4px
+  );
+}
+/* ambient neon glow blob */
+#contact::after {
+  content:''; position:absolute; pointer-events:none; z-index:0;
+  width:clamp(400px,60vw,800px); height:clamp(400px,60vw,800px); border-radius:50%;
+  background:radial-gradient(circle, rgba(125,211,252,.07) 0%, transparent 65%);
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  animation:ct-pulse 5s ease-in-out infinite;
+}
+@keyframes ct-pulse {
+  0%,100% { transform:translate(-50%,-50%) scale(1);   opacity:.7; }
+  50%      { transform:translate(-50%,-50%) scale(1.1); opacity:1; }
+}
+
+/* sec-label and sec-title inside contact need a cap */
+#contact .sec-label,
+#contact .sec-title { max-width:1280px; margin-left:auto; margin-right:auto; }
+#contact .sec-title { font-size:clamp(18px,3vw,40px); margin-bottom:clamp(24px,4vw,52px); }
+
+/* ── CONTACT COMMAND LINE ── */
+.ct-cmd-block {
+  position:relative; z-index:1;
+  max-width:1280px; margin:0 auto clamp(32px,5vw,60px);
+}
+.ct-prompt-line {
+  font-family:var(--mono); font-size:clamp(10px,1.2vw,14px);
+  color:var(--text-lo); margin-bottom:10px; letter-spacing:.04em;
+  display:flex; align-items:flex-start; gap:8px; flex-wrap:wrap;
+  line-height:1.6;
+}
+.ct-prompt-line .ct-dollar { color:var(--sky); flex-shrink:0; }
+.ct-email-giant {
+  display:block; font-family:var(--sans); font-weight:700;
+  font-size:clamp(28px, 7vw, 88px); line-height:1;
+  letter-spacing:-.03em; text-decoration:none;
+  background:linear-gradient(135deg, #e8f4fd 0%, #7dd3fc 30%, #a78bfa 65%, #e8f4fd 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  animation:ct-holo 6s ease infinite;
+  position:relative;
+  transition:letter-spacing .3s;
+}
+.ct-email-giant:hover { letter-spacing:-.01em; }
+@keyframes ct-holo {
+  0%   { background-position:0% 50%; }
+  50%  { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
+}
+/* glitch layers */
+.ct-email-giant::before, .ct-email-giant::after {
+  content:attr(data-text);
+  position:absolute; inset:0;
+  font-family:inherit; font-size:inherit; font-weight:inherit;
+  line-height:inherit; letter-spacing:inherit;
+  opacity:0; pointer-events:none;
+  -webkit-text-fill-color:transparent; background-clip:text;
+  -webkit-background-clip:text;
+}
+.ct-email-giant::before {
+  background:linear-gradient(135deg,var(--violet),var(--rose));
+  animation:ct-glitch-a 4s steps(1) infinite; left:2px;
+}
+.ct-email-giant::after {
+  background:linear-gradient(135deg,var(--sky),var(--green));
+  animation:ct-glitch-b 4s steps(1) infinite; left:-2px;
+}
+@keyframes ct-glitch-a {
+  0%,90%,100% { opacity:0; clip-path:inset(0 0 100% 0); }
+  91% { opacity:.8; clip-path:inset(15% 0 65% 0); transform:translate(-2px,1px); }
+  92% { opacity:.8; clip-path:inset(55% 0 25% 0); transform:translate(2px,-1px); }
+  93% { opacity:0; }
+}
+@keyframes ct-glitch-b {
+  0%,92%,100% { opacity:0; clip-path:inset(0 0 100% 0); }
+  93% { opacity:.7; clip-path:inset(30% 0 50% 0); transform:translate(2px,0); }
+  94% { opacity:.7; clip-path:inset(60% 0 15% 0); transform:translate(-2px,1px); }
+  95% { opacity:0; }
+}
+
+.ct-cursor {
+  display:inline-block; width:clamp(10px,1.8vw,26px); height:.82em;
+  background:var(--sky); vertical-align:middle; margin-left:6px;
+  box-shadow:0 0 16px var(--sky), 0 0 40px rgba(125,211,252,.4);
+  animation:ct-blink .8s steps(2) infinite;
+}
+@keyframes ct-blink { 50%{opacity:0} }
+
+.ct-status-line {
+  font-family:var(--mono); font-size:clamp(10px,1.1vw,12px); color:var(--text-lo);
+  margin-top:clamp(10px,2vw,20px); letter-spacing:.06em;
+  display:flex; align-items:center; gap:clamp(8px,2vw,20px); flex-wrap:wrap;
+}
+.ct-status-line .ok   { color:var(--green); }
+.ct-status-line .info { color:var(--sky); }
+.ct-status-line::before {
+  content:'OUTPUT:'; font-size:9px; letter-spacing:.25em;
+  color:var(--text-lo); padding:2px 8px; border:1px solid var(--border-hi);
+  flex-shrink:0;
+}
+
+/* ── LINK GRID ── */
+.ct-link-grid {
+  position:relative; z-index:1;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--border); border:1px solid var(--border-hi);
+  margin-top:clamp(28px,5vw,60px);
+  max-width:1280px; margin-left:auto; margin-right:auto;
+  margin-top:clamp(28px,5vw,60px);
+}
+.ct-link {
+  background:var(--surface); padding:clamp(16px,2.5vw,28px);
+  text-decoration:none; display:block;
+  position:relative; overflow:hidden;
+  transition:background .2s, transform .2s;
+  border-top:2px solid transparent;
+}
+.ct-link::before {
+  content:''; position:absolute; top:-1px; left:-100%; right:100%; height:2px;
+  background:linear-gradient(90deg,transparent,var(--sky),var(--violet));
+  transition:left .4s ease, right .4s ease;
+}
+.ct-link:hover::before { left:0; right:0; }
+.ct-link::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);
+  pointer-events:none;
+}
+.ct-link:hover {
+  background:linear-gradient(135deg,rgba(125,211,252,.04) 0%,var(--surface2) 100%);
+  transform:translateY(-2px); border-top-color:var(--sky);
+}
+.ct-link-num  { font-family:var(--mono); font-size:clamp(8px,0.8vw,10px); color:var(--text-lo); letter-spacing:.15em; margin-bottom:clamp(8px,1.5vw,16px); display:block; }
+.ct-link-name { font-family:var(--sans); font-size:clamp(13px,1.4vw,16px); font-weight:600; color:var(--text-hi); margin-bottom:4px; display:block; }
+.ct-link-url  { font-family:var(--mono); font-size:clamp(9px,0.9vw,11px); color:var(--text-lo); display:block; margin-bottom:clamp(10px,1.5vw,18px); }
+.ct-link-arr  { font-family:var(--mono); font-size:clamp(10px,1vw,12px); color:var(--sky); display:flex; align-items:center; gap:6px; transition:gap .2s; }
+.ct-link:hover .ct-link-arr { gap:12px; }
+
+/* ── FOOTER ──────────────────────────────── */
+footer {
+  position:relative; z-index:1;
+  border-top:1px solid var(--border);
+  padding:0 60px;
+  font-family:var(--mono);
+  background:var(--surface);
+  overflow:hidden;
+}
+footer::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--violet),var(--gold),var(--sky),transparent);
+  animation:footer-line 4s ease-in-out infinite;
+}
+@keyframes footer-line {
+  0%,100% { opacity:.4; } 50% { opacity:1; }
+}
+.footer-top {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:18px 0 14px; border-bottom:1px solid var(--border);
+  font-size:10px; letter-spacing:.12em;
+}
+.footer-ver { color:var(--text-lo); }
+.footer-status { display:flex; align-items:center; gap:8px; color:var(--green); }
+.footer-status::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--green); display:block; box-shadow:0 0 6px var(--green); animation:blink 1.6s steps(2) infinite; }
+.footer-main {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 0; font-size:10px; color:var(--text-lo); letter-spacing:.06em; flex-wrap:wrap; gap:12px;
+}
+.footer-copy { line-height:1.8; }
+.footer-copy em { font-style:normal; color:var(--violet); }
+.footer-reboot {
+  font-family:var(--mono); font-size:10px; letter-spacing:.15em;
+  color:var(--gold); text-decoration:none; border:1px solid rgba(212,168,83,.3);
+  padding:5px 14px; transition:all .2s; cursor:none;
+  background:rgba(212,168,83,.04);
+}
+.footer-reboot:hover { background:rgba(212,168,83,.12); border-color:var(--gold); letter-spacing:.25em; }
+
+/* ── FADE REVEAL ─────────────────────────── */
+.reveal { opacity:0; transform:translateY(18px); transition:opacity .55s ease,transform .55s ease; }
+.reveal.vis { opacity:1; transform:translateY(0); }
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media(max-width:900px) {
+  nav { padding:0 22px; }
+  .nav-links { display:none; }
+  #hero { grid-template-columns:1fr; gap:40px; padding-left:22px; padding-right:22px; }
+  .hero-terminal { display:none; }
+  .hero-meta { display:none; }
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .pc-content { grid-template-columns:1fr; }
+  .exp-item { grid-template-columns:1fr; gap:12px; }
+  .blog-grid { grid-template-columns:1fr; }
+  .skills-grid { grid-template-columns:1fr; }
+  .section { padding:0 22px 72px; }
+  .ct-link-grid { grid-template-columns:repeat(2,1fr); }
+  .footer-top, .footer-main { flex-direction:column; gap:8px; text-align:center; }
+  footer { padding:16px 22px; }
+}
+
+@media(max-width:600px) {
+  .ct-link-grid { grid-template-columns:1fr 1fr; }
+  .ct-status-line { flex-direction:column; align-items:flex-start; gap:6px; }
+  .ct-prompt-line { font-size:10px; word-break:break-all; }
+  #hero { padding-top:100px; }
+  .pc-content { padding:20px; }
+}
+
+@media(max-width:420px) {
+  .ct-link-grid { grid-template-columns:1fr; }
+  .stats { grid-template-columns:1fr 1fr; }
+}
+</style>
 </head>
 <body>
 
-  <header class="slide-in-left">
-    <h1>👋 Hi, I'm Shreya</h1>
-    <p>Robotics • AI • Diffusion Policies • 3D Vision</p>
-  </header>
+<!-- BOOT -->
+<div id="boot">
+  <div class="bl c-dim"  id="b0">$ ssh <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="76051e04130f1736031b125804191419021f1505581a1714">[email&#160;protected]</a></div>
+  <div class="bl c-gold" id="b1">Connected to RAAS-LAB-001 · Maryland Robotics Center</div>
+  <div class="bl c-dim"  id="b2">Loading research stack...</div>
+  <div class="bl c-green"id="b3">✓  π₀-fast           [deployed · UR3e · 88% success]</div>
+  <div class="bl c-green"id="b4">✓  latent-action-rl   [validated · Isaac Lab + Gym Retro]</div>
+  <div class="bl c-green"id="b5">✓  openVLA-robustness [17.5% → 64.75% under noise]</div>
+  <div class="bl c-sky"  id="b6">✓  variational-grasp  [IROS 2026 · under review]</div>
+  <div class="bl c-warn" id="b7">⚠  metaquest-teleop   [demo pending upload]</div>
+  <div class="bl c-hi"   id="b8">▶  portfolio.sh ready · may 2026 · open to full-time</div>
+</div>
 
-  <div class="content">
+<div id="noise"></div>
+<div id="glow-a"></div>
+<div id="glow-b"></div>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="particles"></canvas>
 
-    <section data-aos="fade-up" class="project">
-      <h2><a href="https://github.com/shreyakalyanaraman/gendp" target="_blank">GenDP: Generalizable Diffusion Policies</a></h2>
-      <p>Multiview diffusion policy for category-level generalization in robotic manipulation.</p>
-    </section>
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#"><em>~/</em>shreya-k</a>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#publications">Publications</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status"><div class="dot"></div>Open to full-time · May 2026</div>
+</nav>
 
-    <section data-aos="fade-up" class="project">
-      <h2><a href="https://github.com/shreyakalyanaraman/realsense-fusion" target="_blank">RealSense Multi-Camera Fusion</a></h2>
-      <p>Calibrating and fusing RGB-D data from multiple RealSense cameras for 3D reconstruction.</p>
-    </section>
+<!-- ═══ HERO ═══════════════════════════════ -->
+<section id="hero">
+  <!-- LEFT -->
+  <div class="hero-left">
+    <div class="hero-kicker">M.Eng Robotics · University of Maryland</div>
+    <h1 class="hero-name" data-name="Shreya">
+      <div class="hero-name-wrap">
+        <span class="solid">Shreya</span>
+        <span class="glitch-a" aria-hidden="true">Shreya</span>
+        <span class="glitch-b" aria-hidden="true">Shreya</span>
+      </div>
+      <span class="outline">Kalyanaraman</span>
+    </h1>
+    <div class="hero-accent-line"></div>
+    <div class="hero-role">
+      <span class="hero-role-item">Robot Learning</span>
+      <span class="hero-role-item">Dexterous Manipulation</span>
+      <span class="hero-role-item">VLA Systems</span>
+    </div>
+    <p class="hero-desc">
+      I build systems that let robots <strong>act in the real world</strong> — deploying foundation models on real hardware, studying how they break, and designing better ways for them to generalize.
+    </p>
+    <div class="hero-links">
+      <a href="#projects" class="btn btn-primary">Projects</a>
+      <a href="Shreya_Kalyanaraman_Resume.pdf" class="btn btn-ghost" target="_blank">Resume ↗</a>
+      <a href="/cdn-cgi/l/email-protection#3d4e554f58445c0d087d48505913585948" class="btn btn-ghost">Email</a>
+    </div>
+  </div>
 
-    <section data-aos="fade-up" class="project">
-      <h2><a href="https://github.com/shreyakalyanaraman/ur3e-manipulation" target="_blank">UR3e Manipulation with ACT</a></h2>
-      <p>Action Chunking Transformer for complex 6-DoF robotic manipulation with Allegro Hand.</p>
-    </section>
+  <!-- RIGHT: interactive terminal -->
+  <div class="hero-terminal" id="hero-term">
+    <div class="term-bar">
+      <div class="term-dots">
+        <div class="term-dot td-r"></div>
+        <div class="term-dot td-y"></div>
+        <div class="term-dot td-g"></div>
+      </div>
+      <div class="term-title">shreya — python3</div>
+    </div>
+    <div class="term-body" id="term-output"></div>
+  </div>
 
-    <section class="tool" data-aos="fade-up">
-      <h3>🛠️ Tools Used</h3>
-      <ul>
-        <li><strong><a href="https://pages.github.com/" target="_blank">GitHub Pages</a></strong> – To host my static website</li>
-        <li><strong><a href="https://michalsnik.github.io/aos/" target="_blank">AOS (Animate On Scroll)</a></strong> – For smooth scroll-triggered animations</li>
-        <li><strong><a href="https://animista.net/" target="_blank">Animista</a></strong> – For interactive CSS animations</li>
-      </ul>
-    </section>
+  <!-- BOTTOM META spans both cols -->
+  <div class="hero-meta">
+    <span>College Park, MD · Graduating May 2026</span>
+    <div class="hero-scroll"><div class="scroll-line"></div><span>scroll</span></div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- ═══ ABOUT ══════════════════════════════ -->
+<div class="section" id="about">
+  <div class="sec-label reveal">Overview</div>
+  <div class="sec-title reveal">8 projects. 4 real robots.<br>1 paper under review.</div>
+  <div class="stats reveal">
+    <div class="stat-item"><div class="corner-tr"></div><span class="stat-n" data-count="8">0</span><div class="stat-l">Projects</div></div>
+    <div class="stat-item"><div class="corner-tr"></div><span class="stat-n" data-count="1">0</span><div class="stat-l">Under Review (IROS)</div></div>
+    <div class="stat-item"><div class="corner-tr"></div><span class="stat-n" data-count="4">0</span><div class="stat-l">Real Robot Platforms</div></div>
+    <div class="stat-item"><div class="corner-tr"></div><span class="stat-n" data-count="5">0</span><div class="stat-l">Research & Industry Roles</div></div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- ═══ PROJECTS ════════════════════════════ -->
+<div class="section" id="projects">
+  <div class="sec-label reveal">Work</div>
+  <div class="sec-title reveal">Projects</div>
+  <div class="projects-list reveal">
+
+    <!-- 01 -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">01</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-research">Research</span><span class="pc-badge pb-research" style="color:var(--violet);border-color:rgba(167,139,250,.3)">IROS 2026 · Under Review</span></div>
+          <div class="pc-name">Variational Neural Belief Parameterizations for Robust Dexterous Grasping under Multimodal Uncertainty</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">A probabilistic grasping framework using variational inference to model multimodal uncertainty over object pose, contact geometry, and success probability. Rather than committing to a single grasp configuration, the system maintains a distribution over grasps — enabling robustness to sensor noise and occlusion that causes deployed humanoid systems to fail in unstructured environments.</p>
+            <div class="pc-result">↑ Robust grasp success under multimodal uncertainty · Cross-geometry generalization</div>
+            <div class="pc-stack">
+              <span class="chip">Variational Inference</span><span class="chip">PyTorch</span><span class="chip">MuJoCo</span><span class="chip">RealHand L6</span><span class="chip">Grasp Synthesis</span><span class="chip">Multimodal Perception</span>
+            </div>
+            <div class="pc-links">
+              <a href="#">[IROS 2026 — Under Review]</a>
+              <a href="#">[Preprint — Coming Soon]</a>
+            </div>
+          </div>
+          <div class="pc-aside"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">02</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-hardware">Hardware</span></div>
+          <div class="pc-name">Teleoperation via Meta Quest 3 for Dexterous Data Collection</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">VR bilateral teleoperation system using Meta Quest 3 hand tracking to control dexterous robot hands in real-time. Removes the demonstration data bottleneck — collecting high-fidelity contact-rich trajectories for imitation learning at scale without specialized hardware rigs.</p>
+            <div class="pc-result">Real-time VR control · High-fidelity IL demonstration pipeline</div>
+            <div class="pc-stack">
+              <span class="chip">Meta Quest 3</span><span class="chip">ROS2</span><span class="chip">Python</span><span class="chip">RealHand L6</span><span class="chip">Bilateral Control</span>
+            </div>
+            <div class="pc-links">
+              <a href="#" id="demo-link-02">▶ Watch Demo</a>
+              <a href="https://github.com/shreyak-05" target="_blank">[GitHub]</a>
+            </div>
+          </div>
+          <div class="pc-aside"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">03</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-research">Research</span><span class="pc-badge pb-rl" style="color:var(--sky);border-color:rgba(125,211,252,.3)">RL · Transfer</span></div>
+          <div class="pc-name">Acting Across Action Spaces — Latent Action Transfer for RL Agents</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">A transfer learning framework enabling a single RL agent to operate across environments with heterogeneous action spaces — no retraining required. A transformer-based Inverse Dynamics Model infers semantic action embeddings from state-transition pairs at test time. A learned policy decodes via cosine similarity in latent space, selecting the correct action for any unseen embodiment. Jointly trained via REINFORCE + cross-entropy. Validated on OpenAI Gym Retro and multi-DoF robotic embodiments in Isaac Lab.</p>
+            <div class="pc-result">Single policy · Multiple embodiments · Zero-shot action space generalization</div>
+            <div class="pc-stack">
+              <span class="chip">PyTorch</span><span class="chip">REINFORCE</span><span class="chip">Transformer IDM</span><span class="chip">Isaac Lab</span><span class="chip">OpenAI Gym Retro</span>
+            </div>
+            <div class="pc-links">
+              <a href="#">[Course Paper]</a>
+              <a href="https://github.com/shreyak-05" target="_blank">[GitHub]</a>
+            </div>
+          </div>
+          <div class="pc-aside"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 TMI -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">04</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-vla">VLA Research</span><span class="pc-badge" style="color:var(--text-lo);border-color:var(--border-hi)">CMSC 848K · UMD</span></div>
+          <div class="pc-name">TMI: Teaching OpenVLA to Ignore the Fluff</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">Studied how realistic language noise breaks OpenVLA. Noisy instructions ("okay, let's get the alphabet soup — try not to knock anything over") drop success from 69% to 17.5%. Compared two fixes: external LLM instruction filtering (LLaMA-3.1-8B, no retraining) vs internal LoRA fine-tuning on perturbed demonstrations. Evaluated via 20-rollout online evaluation per condition on LIBERO Object and Spatial suites.</p>
+            <div class="pc-result">LLM filter: 17.5% → 64.75% · +47.25% recovery with zero retraining</div>
+            <div class="pc-stack">
+              <span class="chip">OpenVLA</span><span class="chip">LoRA</span><span class="chip">LLaMA-3.1-8B</span><span class="chip">LIBERO</span><span class="chip">PyTorch</span><span class="chip">SigLIP</span>
+            </div>
+            <div class="pc-links">
+              <a href="https://drive.google.com/drive/folders/1TzSCYKKccH5_FjAM-6BKAuFjvwQy2-n0" target="_blank">[Slides]</a>
+              <a href="https://github.com/shreyak-05" target="_blank">[GitHub]</a>
+              <a href="blog/tmi.html">[Full Writeup →]</a>
+            </div>
+          </div>
+          <div class="pc-aside">
+            <div class="aside-label">Results — LIBERO Object</div>
+            <table class="results-table">
+              <tr><th>Condition</th><th>Baseline</th><th>LLM Filter</th></tr>
+              <tr><td>Noisy</td><td class="base">17.5%</td><td class="win">64.75%</td></tr>
+              <tr><td>Conv.</td><td>64.0%</td><td class="win">69.0%</td></tr>
+              <tr><td>Paraphrase</td><td>56.75%</td><td class="win">69.0%</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 Pi0 -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">05</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-vla">Foundation Model</span></div>
+          <div class="pc-name">π₀-Fast on UR3e — Cross-Embodiment Policy Transfer</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">Adapted Physical Intelligence's π₀-Fast — originally trained on UR5e — for real-time inference on a UR3e. Resolved kinematic limit mismatches, joint space remapping, and control API incompatibilities. Deployed on grocery bagging and table bussing tasks in the RAAS Lab.</p>
+            <div class="pc-result">88% task success · &lt;6ms inference · &lt;0.5% damage rate</div>
+            <div class="pc-stack">
+              <span class="chip">π₀</span><span class="chip">UR3e</span><span class="chip">ROS2</span><span class="chip">Python</span><span class="chip">Real-time Inference</span>
+            </div>
+            <div class="pc-links">
+              <a href="#" class="demo-trigger" data-src="">▶ Watch Demo</a>
+            </div>
+          </div>
+          <div class="pc-aside"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 LeRobot -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">06</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-hardware">Real Robot</span></div>
+          <div class="pc-name">ACT Policy on Koch Arms — LeRobot Hackathon 2025</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">Assembled dual-arm Koch manipulators from scratch. Built a Python control wrapper for synchronized joint-state feedback. Collected pick-and-place demonstrations via active-passive mimicking. Trained an Action Chunking Transformer directly on the hardware demos.</p>
+            <div class="pc-result">92% pick-and-place success · Real-time ACT on Koch hardware</div>
+            <div class="pc-stack">
+              <span class="chip">ACT</span><span class="chip">LeRobot</span><span class="chip">Koch Arms</span><span class="chip">Imitation Learning</span><span class="chip">Python</span>
+            </div>
+            <div class="pc-links">
+              <a href="https://github.com/zahirmahammad/act" target="_blank">[GitHub]</a>
+            </div>
+          </div>
+          <div class="pc-aside"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 DRL -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">07</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-rl">Deep RL</span></div>
+          <div class="pc-name">DRL Autonomous Parking in CARLA (PPO / DDPG)</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">PPO and DDPG agents for autonomous parallel and perpendicular parking in CARLA simulator. Sensor fusion across LiDAR, radar, and vision. Curriculum learning reduced average maneuver time by 20% with 95% safety compliance across 500+ evaluation trials.</p>
+            <div class="pc-result">93%+ parking success · 20% faster maneuver · 95% safety compliance</div>
+            <div class="pc-stack">
+              <span class="chip">PPO</span><span class="chip">DDPG</span><span class="chip">CARLA</span><span class="chip">Sensor Fusion</span><span class="chip">PyTorch</span>
+            </div>
+            <div class="pc-links">
+              <a href="https://github.com/shreyak-05/Carla_PPO_DDPG" target="_blank">[GitHub]</a>
+            </div>
+          </div>
+          <div class="pc-aside"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 08 Barista -->
+    <div class="pc">
+      <div class="pc-header">
+        <span class="pc-num">08</span>
+        <div class="pc-header-main">
+          <div class="pc-type-row"><span class="pc-badge pb-sim">Simulation</span></div>
+          <div class="pc-name">Autonomous Barista Robot — UR10e in ROS2 / Gazebo</div>
+        </div>
+        <div class="pc-toggle">+</div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-content">
+          <div>
+            <p class="pc-desc">Led a team of 4 to build a full ROS2 package for a 6-DoF UR10e performing autonomous coffee-making in a custom Gazebo environment. Implemented position, velocity, and effort controllers with inverse velocity kinematics solved to sub-2mm precision.</p>
+            <div class="pc-result">&lt;2mm trajectory deviation · Full task autonomy in simulation</div>
+            <div class="pc-stack">
+              <span class="chip">ROS2</span><span class="chip">Gazebo</span><span class="chip">UR10e</span><span class="chip">MoveIt</span><span class="chip">IVK</span><span class="chip">RViz</span>
+            </div>
+            <div class="pc-links">
+              <a href="https://github.com/shreyak-05/BARISTA-ROBOT" target="_blank">[GitHub]</a>
+            </div>
+          </div>
+          <div class="pc-aside"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /projects-list -->
+</div>
+
+<div class="div"></div>
+
+<!-- ═══ EXPERIENCE ══════════════════════════ -->
+<div class="section" id="experience">
+  <div class="sec-label reveal">History</div>
+  <div class="sec-title reveal">Experience</div>
+  <div class="exp-list reveal">
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-date">Jan 2026 – Present</div>
+        <div class="exp-org">Artly AI (via UMD)</div>
+        <div class="exp-loc">Seattle, WA · Remote</div>
+      </div>
+      <div>
+        <div class="exp-role">Robot Learning Intern</div>
+        <ul class="exp-bullets">
+          <li>Building dexterous manipulation pipelines in MuJoCo and on the RealHand L6 — grasp synthesis, policy learning, and multimodal perception end-to-end.</li>
+          <li>Developing scalable data collection frameworks for large-scale manipulation datasets, targeting improved grasp stability and cross-geometry generalization.</li>
+        </ul>
+        <div class="exp-stack"><span class="chip">MuJoCo</span><span class="chip">RealHand L6</span><span class="chip">Grasp Synthesis</span><span class="chip">Policy Learning</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-date">Jan 2025 – Present</div>
+        <div class="exp-org">RAAS Lab · Maryland Robotics Center</div>
+        <div class="exp-loc">College Park, MD</div>
+      </div>
+      <div>
+        <div class="exp-role">Research Assistant</div>
+        <ul class="exp-bullets">
+          <li>Developing latent action transfer framework — single RL agent across heterogeneous embodiments, validated on OpenAI Gym Retro and Isaac Lab.</li>
+          <li>Deployed and fine-tuned π₀-Fast on a UR3e: sub-6ms inference, 88% task success, &lt;0.5% damage rate.</li>
+          <li>Calibrated 3-camera Intel RealSense + Anyskin tactile sensor system for multimodal manipulation feedback.</li>
+        </ul>
+        <div class="exp-stack"><span class="chip">π₀</span><span class="chip">UR3e</span><span class="chip">ROS2</span><span class="chip">Intel RealSense</span><span class="chip">Anyskin</span><span class="chip">Isaac Lab</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-date">Feb – Jul 2024</div>
+        <div class="exp-org">IIT Madras · GNC Lab</div>
+        <div class="exp-loc">Chennai, India</div>
+      </div>
+      <div>
+        <div class="exp-role">Research Intern — Guidance, Navigation & Control</div>
+        <ul class="exp-bullets">
+          <li>Implemented GDTS algorithm in ROS2/Gazebo for UAV search-and-rescue source localization.</li>
+          <li>Developed 3D Velocity Obstacles for multi-drone collision avoidance in dense aerial scenarios.</li>
+        </ul>
+        <div class="exp-stack"><span class="chip">ROS2</span><span class="chip">Gazebo</span><span class="chip">UAV</span><span class="chip">3D Velocity Obstacles</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-date">Previous</div>
+        <div class="exp-org">AtumX</div>
+        <div class="exp-loc">India</div>
+      </div>
+      <div>
+        <div class="exp-role">Robotics Engineer</div>
+        <ul class="exp-bullets">
+          <li>Hardware integration and software stack development at an early-stage robotics startup.</li>
+        </ul>
+        <div class="exp-stack"><span class="chip">Embedded C</span><span class="chip">Python</span><span class="chip">Hardware</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div>
+        <div class="exp-date">Previous</div>
+        <div class="exp-org">Equad Engineering</div>
+        <div class="exp-loc">India</div>
+      </div>
+      <div>
+        <div class="exp-role">Engineering Role</div>
+        <ul class="exp-bullets">
+          <li>Control systems and embedded development across robotics integration and real-time systems.</li>
+        </ul>
+        <div class="exp-stack"><span class="chip">Control Systems</span><span class="chip">Embedded C</span></div>
+      </div>
+    </div>
 
   </div>
 
-  <footer>
-    &copy; 2025 Shreya Kalyanaraman
-  </footer>
+  <!-- SKILLS -->
+  <div class="sec-label reveal" style="margin-top:72px">Stack</div>
+  <div class="skills-grid reveal">
+    <div class="skill-col">
+      <div class="skill-col-title">Robotics & Hardware</div>
+      <div class="skill-row">ROS2 / MoveIt <div class="skill-bar-wrap"><div class="skill-bar" data-w="95"></div></div></div>
+      <div class="skill-row">UR3e / UR5e / UR10e <div class="skill-bar-wrap"><div class="skill-bar" data-w="92"></div></div></div>
+      <div class="skill-row">RealHand L6 <div class="skill-bar-wrap"><div class="skill-bar" data-w="85"></div></div></div>
+      <div class="skill-row">Intel RealSense <div class="skill-bar-wrap"><div class="skill-bar" data-w="88"></div></div></div>
+      <div class="skill-row">Meta Quest 3 <div class="skill-bar-wrap"><div class="skill-bar" data-w="80"></div></div></div>
+    </div>
+    <div class="skill-col">
+      <div class="skill-col-title">ML / AI</div>
+      <div class="skill-row">PyTorch / JAX <div class="skill-bar-wrap"><div class="skill-bar" data-w="92"></div></div></div>
+      <div class="skill-row">π₀ / Diffusion Policy <div class="skill-bar-wrap"><div class="skill-bar" data-w="88"></div></div></div>
+      <div class="skill-row">OpenVLA / LoRA <div class="skill-bar-wrap"><div class="skill-bar" data-w="85"></div></div></div>
+      <div class="skill-row">ACT / Imitation Learning <div class="skill-bar-wrap"><div class="skill-bar" data-w="90"></div></div></div>
+      <div class="skill-row">RL (PPO, TD3, SAC) <div class="skill-bar-wrap"><div class="skill-bar" data-w="87"></div></div></div>
+    </div>
+    <div class="skill-col">
+      <div class="skill-col-title">Simulation & Tools</div>
+      <div class="skill-row">MuJoCo / PyBullet <div class="skill-bar-wrap"><div class="skill-bar" data-w="90"></div></div></div>
+      <div class="skill-row">Isaac Sim / SAPIEN <div class="skill-bar-wrap"><div class="skill-bar" data-w="82"></div></div></div>
+      <div class="skill-row">Gazebo / CARLA <div class="skill-bar-wrap"><div class="skill-bar" data-w="88"></div></div></div>
+      <div class="skill-row">C++ / Embedded C <div class="skill-bar-wrap"><div class="skill-bar" data-w="78"></div></div></div>
+      <div class="skill-row">Docker / Linux / Git <div class="skill-bar-wrap"><div class="skill-bar" data-w="92"></div></div></div>
+    </div>
+  </div>
+</div>
 
-  <!-- AOS JS -->
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script>
-    AOS.init();
-  </script>
+<div class="div"></div>
 
+<!-- ═══ PUBLICATIONS ═════════════════════════ -->
+<div class="section" id="publications">
+  <div class="sec-label reveal">Research Output</div>
+  <div class="sec-title reveal">Publications</div>
+  <div class="pub-list reveal">
+
+    <div class="pub-item">
+      <div class="pub-venue pv-review">IROS<br>2026<br>Under Review</div>
+      <div>
+        <div class="pub-title">Variational Neural Belief Parameterizations for Robust Dexterous Grasping under Multimodal Uncertainty</div>
+        <div class="pub-authors"><strong>Shreya Kalyanaraman</strong>, [Co-authors TBA]</div>
+        <div class="pub-chips"><span class="chip">Dexterous Grasping</span><span class="chip">Variational Inference</span><span class="chip">Manipulation</span></div>
+        <div class="pub-links"><a href="#">Preprint — Coming Soon</a></div>
+      </div>
+    </div>
+
+    <div class="pub-item">
+      <div class="pub-venue pv-course">Course<br>Paper<br>CMSC 848K</div>
+      <div>
+        <div class="pub-title">TMI: Teaching OpenVLA to Ignore the Fluff — Robustness to Instruction Perturbations</div>
+        <div class="pub-authors"><strong>Shreya Kalyanaraman</strong>, Kunj Golwala · CMSC 848K, UMD</div>
+        <div class="pub-chips"><span class="chip">OpenVLA</span><span class="chip">LoRA</span><span class="chip">LLM Filtering</span><span class="chip">LIBERO</span></div>
+        <div class="pub-links">
+          <a href="https://drive.google.com/drive/folders/1TzSCYKKccH5_FjAM-6BKAuFjvwQy2-n0" target="_blank">Slides ↗</a>
+          <a href="blog/tmi.html">Full Writeup →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pub-item" style="opacity:.6">
+      <div class="pub-venue pv-course">Course<br>Paper<br>CMSC 848N</div>
+      <div>
+        <div class="pub-title">Acting Across Action Spaces: Transfer Learning for RL Agents Across Heterogeneous Embodiments</div>
+        <div class="pub-authors">Sahire Ellahy, <strong>Shreya Kalyanaraman</strong> · CMSC 848N, UMD</div>
+        <div class="pub-chips"><span class="chip">Transfer RL</span><span class="chip">Latent Action Space</span><span class="chip">IDM</span></div>
+        <div class="pub-links"><a href="#">PDF ↗</a></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- ═══ BLOG ══════════════════════════════ -->
+<div class="section" id="blog">
+  <div class="sec-label reveal">Writing</div>
+  <div class="sec-title reveal">Blog</div>
+  <p class="reveal" style="font-family:var(--sans);font-size:15px;color:var(--text);margin-bottom:40px;font-weight:300;line-height:1.7">Notes on robot learning, foundation models, and things I've built that actually work (and things that didn't).</p>
+  <div class="blog-grid reveal">
+
+    <a class="blog-card" href="blog/tmi.html">
+      <span class="bc-tl"></span><span class="bc-br"></span>
+      <div class="blog-meta"><span class="blog-tag">Research</span><span class="blog-date">2025</span><span class="blog-read">~10 min</span></div>
+      <div class="blog-title">TMI: Teaching OpenVLA to Ignore the Fluff</div>
+      <div class="blog-excerpt">Noisy instructions drop OpenVLA success from 69% to 17.5%. We studied why, and compared two fixes — external LLM filtering vs LoRA fine-tuning. The results were clear.</div>
+      <div class="blog-more">Read writeup →</div>
+    </a>
+
+    <a class="blog-card" href="blog/attention.html">
+      <span class="bc-tl"></span><span class="bc-br"></span>
+      <div class="blog-meta"><span class="blog-tag">Paper Review</span><span class="blog-date">2025</span><span class="blog-read">~8 min</span></div>
+      <div class="blog-title">Attention is All You Need — and Why It Matters for Robotics</div>
+      <div class="blog-excerpt">What the transformer architecture actually is, why it's modality-agnostic, and what that means for VLA models like RT-2 and π₀. With my own take on the open problems.</div>
+      <div class="blog-more">Read review →</div>
+    </a>
+
+    <a class="blog-card" href="blog/flashattention.html">
+      <span class="bc-tl"></span><span class="bc-br"></span>
+      <div class="blog-meta"><span class="blog-tag">Paper Review</span><span class="blog-date">2025</span><span class="blog-read">~6 min</span></div>
+      <div class="blog-title">FlashAttention: Why Exact Attention Was Always Possible, Just Slow</div>
+      <div class="blog-excerpt">FlashAttention doesn't approximate — it computes the same result, just faster, by being smarter about memory access. A breakdown of tiling, recomputation, and kernel fusion.</div>
+      <div class="blog-more">Read review →</div>
+    </a>
+
+    <a class="blog-card" href="blog/vla-limits.html">
+      <span class="bc-tl"></span><span class="bc-br"></span>
+      <div class="blog-meta"><span class="blog-tag">Opinion</span><span class="blog-date">2025</span><span class="blog-read">~7 min</span></div>
+      <div class="blog-title">What Dexterous Manipulation Actually Needs — and Why VLAs Alone Aren't Enough</div>
+      <div class="blog-excerpt">Foundation models nail language-to-action mapping but collapse under contact uncertainty and occlusion. The case for explicit uncertainty modeling in real robot deployment.</div>
+      <div class="blog-more">Read →</div>
+    </a>
+
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- ═══ CONTACT ══════════════════════════════ -->
+<div class="section" id="contact">
+  <div class="sec-label reveal">Get in Touch</div>
+
+  <!-- command line block -->
+  <div class="ct-cmd-block reveal">
+    <div class="ct-prompt-line">
+      <span class="ct-dollar">$</span>
+      <span>shreya --contact --available "May 2026" --open-to "robot-learning,manipulation,VLA"</span>
+    </div>
+    <a class="ct-email-giant" href="mailto:shreya05@umd.edu" data-text="shreya05@umd.edu">
+      shreya05@umd.edu<span class="ct-cursor"></span>
+    </a>
+    <div class="ct-status-line">
+      <span class="ok">✓ PING SUCCESS — 200ms avg response time</span>
+      <span class="info">LOCATION: College Park, MD</span>
+      <span class="info">STATUS: actively_looking</span>
+    </div>
+  </div>
+
+  <!-- link grid -->
+  <div class="ct-link-grid reveal">
+    <a href="https://github.com/shreyak-05" class="ct-link" target="_blank">
+      <span class="ct-link-num">01 / GITHUB</span>
+      <span class="ct-link-name">GitHub</span>
+      <span class="ct-link-url">github.com/shreyak-05</span>
+      <span class="ct-link-arr">cd ./code <span>→</span></span>
+    </a>
+    <a href="https://www.linkedin.com/in/shreya-k05/" class="ct-link" target="_blank">
+      <span class="ct-link-num">02 / LINKEDIN</span>
+      <span class="ct-link-name">LinkedIn</span>
+      <span class="ct-link-url">linkedin.com/in/shreya-k05</span>
+      <span class="ct-link-arr">connect --pro <span>→</span></span>
+    </a>
+    <a href="#" class="ct-link" target="_blank">
+      <span class="ct-link-num">03 / SCHOLAR</span>
+      <span class="ct-link-name">Google Scholar</span>
+      <span class="ct-link-url">adding this week</span>
+      <span class="ct-link-arr">grep papers/ <span>→</span></span>
+    </a>
+    <a href="Shreya_Kalyanaraman_Resume.pdf" class="ct-link" target="_blank">
+      <span class="ct-link-num">04 / RESUME</span>
+      <span class="ct-link-name">Resume PDF</span>
+      <span class="ct-link-url">Shreya_Kalyanaraman_Resume.pdf</span>
+      <span class="ct-link-arr">cat resume.pdf <span>→</span></span>
+    </a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <span class="footer-ver">SHREYA-K · PORTFOLIO v2.0 · BUILD 2026.05</span>
+    <span class="footer-status">OPEN TO FULL-TIME · MAY 2026</span>
+  </div>
+  <div class="footer-main">
+    <div class="footer-copy">
+      © 2025 Shreya Kalyanaraman · University of Maryland<br>
+      This portfolio is part of the <em>robot learning</em> research stack.
+      Unauthorized deployment to production robots is <em>highly encouraged</em>.
+    </div>
+    <a href="#" class="footer-reboot" onclick="location.reload();return false;">[ REBOOT ]</a>
+  </div>
+</footer>
+
+<!-- VIDEO MODAL -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:8000;align-items:center;justify-content:center;backdrop-filter:blur(8px);">
+  <div style="position:relative;width:min(860px,92vw);background:var(--surface);border:1px solid var(--border-hi);padding:8px;">
+    <button id="modal-close" style="position:absolute;top:-36px;right:0;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:12px;cursor:none;letter-spacing:.1em;">[ close ✕ ]</button>
+    <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+      <iframe id="modal-iframe" style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── BOOT ──────────────────────────────────────
+const lines = document.querySelectorAll('.bl');
+const boot = document.getElementById('boot');
+let t = 0;
+lines.forEach((l, i) => {
+  t += i === 0 ? 200 : 280;
+  setTimeout(() => { l.style.transition = 'opacity .25s'; l.style.opacity = '1'; }, t);
+});
+setTimeout(() => {
+  boot.style.transition = 'opacity .65s';
+  boot.style.opacity = '0';
+  setTimeout(() => boot.remove(), 650);
+}, t + 500);
+
+// ── CURSOR ────────────────────────────────────
+const cur = document.getElementById('cur');
+const crn = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx-4+'px'; cur.style.top=my-4+'px';
+});
+(function loop(){
+  rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+  crn.style.left=rx-16+'px'; crn.style.top=ry-16+'px';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,.pc,.blog-card,.stat-item,.exp-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ cur.style.transform='scale(2.5)'; crn.style.transform='scale(1.4)'; crn.style.borderColor='rgba(212,168,83,.65)'; });
+  el.addEventListener('mouseleave',()=>{ cur.style.transform='scale(1)'; crn.style.transform='scale(1)'; crn.style.borderColor='rgba(212,168,83,.28)'; });
+});
+
+// ── PARTICLES ─────────────────────────────────
+const cv=document.getElementById('particles');
+const ct=cv.getContext('2d');
+function rsz(){ cv.width=innerWidth; cv.height=innerHeight; } rsz();
+window.addEventListener('resize',rsz);
+const pts=Array.from({length:50},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.16,vy:(Math.random()-.5)*.16,r:Math.random()*1.3+.3}));
+(function draw(){
+  ct.clearRect(0,0,cv.width,cv.height);
+  pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>cv.width)p.vx*=-1;if(p.y<0||p.y>cv.height)p.vy*=-1;});
+  for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+    const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<115){ct.beginPath();ct.moveTo(pts[i].x,pts[i].y);ct.lineTo(pts[j].x,pts[j].y);ct.strokeStyle=`rgba(212,168,83,${.04*(1-d/115)})`;ct.lineWidth=.5;ct.stroke();}
+  }
+  pts.forEach(p=>{ct.beginPath();ct.arc(p.x,p.y,p.r,0,Math.PI*2);ct.fillStyle='rgba(167,139,250,.14)';ct.fill();});
+  requestAnimationFrame(draw);
+})();
+
+// ── ACCORDION ─────────────────────────────────
+document.querySelectorAll('.pc-header').forEach(h=>{
+  h.addEventListener('click',()=>{
+    const pc=h.closest('.pc');
+    const wasOpen=pc.classList.contains('open');
+    document.querySelectorAll('.pc.open').forEach(p=>p.classList.remove('open'));
+    if(!wasOpen) pc.classList.add('open');
+  });
+});
+
+// ── SCROLL REVEAL ─────────────────────────────
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('vis');
+      e.target.querySelectorAll('.skill-bar').forEach(b=>setTimeout(()=>b.style.width=b.dataset.w+'%',200));
+      e.target.querySelectorAll('[data-count]').forEach(el=>{
+        const t=parseInt(el.dataset.count);let c=0;
+        const s=()=>{c++;el.textContent=c;if(c<t)setTimeout(s,80);};s();
+      });
+    }
+  });
+},{threshold:.08});
+document.querySelectorAll('.reveal,.projects-list,.pub-list,.exp-list,.blog-grid,.skills-grid').forEach(el=>obs.observe(el));
+
+// ── NAV ACTIVE ────────────────────────────────
+window.addEventListener('scroll',()=>{
+  let cur2='';
+  ['projects','experience','publications','blog','contact'].forEach(id=>{
+    const s=document.getElementById(id);
+    if(s&&scrollY>=s.offsetTop-160) cur2=id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur2));
+});
+
+// ── VIDEO MODAL ───────────────────────────────
+const modal=document.getElementById('modal');
+const iframe=document.getElementById('modal-iframe');
+document.getElementById('modal-close').addEventListener('click',closeModal);
+modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
+function openModal(src){ iframe.src=src; modal.style.display='flex'; document.body.style.overflow='hidden'; }
+function closeModal(){ modal.style.display='none'; iframe.src=''; document.body.style.overflow=''; }
+document.querySelectorAll('.demo-trigger').forEach(a=>{
+  a.addEventListener('click',e=>{ e.preventDefault(); const src=a.dataset.src; if(src) openModal(src); });
+});
+// For demo links without data-src — show placeholder message until user adds real URL
+document.querySelectorAll('[id^="demo-link"]').forEach(a=>{
+  a.addEventListener('click',e=>{ e.preventDefault(); alert('Add your demo video URL to the data-src attribute of this link.'); });
+});
+
+// ── HERO TERMINAL ─────────────────────────────
+(function(){
+  const out = document.getElementById('term-output');
+  if(!out) return;
+
+  const lines = [
+    { t:0,   cls:'tl-dim',    text:'Python 3.11.4 · shreya-k portfolio v2.0' },
+    { t:280, cls:'tl-dim',    text:'Type help() for more information.' },
+    { t:380, cls:'tl-dim',    text:'' },
+    { t:420, cls:'',          text:'<span class="prompt">&gt;&gt;&gt;</span> import shreya' },
+    { t:900, cls:'tl-dim',    text:'' },
+    { t:940, cls:'',          text:'<span class="prompt">&gt;&gt;&gt;</span> shreya.skills' },
+    { t:1300,cls:'tl-violet', text:"['pi0', 'OpenVLA', 'LoRA', 'ACT', 'Diffusion Policy'," },
+    { t:1380,cls:'tl-violet', text:" 'ROS2', 'MuJoCo', 'PyTorch', 'Isaac Lab'," },
+    { t:1460,cls:'tl-violet', text:" 'UR3e', 'RealHand L6', 'Meta Quest 3']" },
+    { t:1540,cls:'tl-dim',    text:'' },
+    { t:1580,cls:'',          text:'<span class="prompt">&gt;&gt;&gt;</span> shreya.research' },
+    { t:1980,cls:'tl-gold',   text:"'Dexterous manipulation under multimodal" },
+    { t:2060,cls:'tl-gold',   text:" uncertainty — where VLAs meet real contact'" },
+    { t:2140,cls:'tl-dim',    text:'' },
+    { t:2180,cls:'',          text:'<span class="prompt">&gt;&gt;&gt;</span> shreya.papers[0]' },
+    { t:2560,cls:'tl-rose',   text:"Paper(title='Variational Neural Belief" },
+    { t:2620,cls:'tl-rose',   text:"       Parameterizations...'" },
+    { t:2680,cls:'tl-sky',    text:"       venue='IROS 2026', status='under_review')" },
+    { t:2740,cls:'tl-dim',    text:'' },
+    { t:2780,cls:'',          text:'<span class="prompt">&gt;&gt;&gt;</span> <span id="typed-cmd"></span><span class="term-cursor"></span>' },
+  ];
+
+  const typedCmds = [
+    "shreya.deploy(model='pi0', robot='UR3e')",
+    'shreya.status',
+    "shreya.contact()",
+  ];
+  let cmdIdx = 0;
+
+  function printLines(i) {
+    if(i >= lines.length) { startTyping(); return; }
+    const l = lines[i];
+    setTimeout(() => {
+      const span = document.createElement('span');
+      span.className = 'tl ' + (l.cls||'tl-cmd');
+      span.innerHTML = l.text + '\n';
+      out.appendChild(span);
+      out.scrollTop = out.scrollHeight;
+      printLines(i+1);
+    }, l.t - (i>0 ? lines[i-1].t : 0));
+  }
+
+  function startTyping() {
+    const el = document.getElementById('typed-cmd');
+    if(!el) return;
+    const cmd = typedCmds[cmdIdx % typedCmds.length];
+    let ci = 0;
+    const t = setInterval(() => {
+      if(ci <= cmd.length) { el.textContent = cmd.slice(0,ci); ci++; }
+      else {
+        clearInterval(t);
+        setTimeout(() => {
+          // clear and cycle          cmdIdx++;
+          el.textContent = '';
+          setTimeout(() => startTyping(), 400);
+        }, 2400);
+      }
+    }, 55);
+  }
+
+  // delay terminal until after boot clears
+  setTimeout(() => printLines(0), 2200);
+})();
+</script>
 </body>
 </html>
-

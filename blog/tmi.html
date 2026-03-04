@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMI: Teaching OpenVLA to Ignore the Fluff · Shreya Kalyanaraman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#070b10;--surface:#0c1219;--surface2:#101922;--border:#1a2535;--border-hi:#243448;
+  --gold:#d4a853;--gold-dim:rgba(212,168,83,.1);--violet:#a78bfa;--rose:#f9a8d4;
+  --sky:#7dd3fc;--green:#6ee7b7;
+  --text:#7a9ab5;--text-lo:#2a3f55;--text-hi:#c8dff0;
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--serif:'DM Serif Display',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.8;overflow-x:hidden;cursor:none;font-size:16px;}
+#cur{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .1s;}
+#cur-ring{width:32px;height:32px;border:1px solid rgba(212,168,83,.28);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:left .12s ease,top .12s ease;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(212,168,83,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,.012) 1px,transparent 1px);background-size:48px 48px;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:54px;padding:0 52px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,11,16,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--mono);font-size:13px;color:var(--gold);text-decoration:none;letter-spacing:.05em;}
+.logo em{color:var(--text-lo);font-style:normal;}
+.nav-back{font-family:var(--mono);font-size:11px;color:var(--text-lo);text-decoration:none;letter-spacing:.1em;transition:color .15s;display:flex;align-items:center;gap:6px;}
+.nav-back:hover{color:var(--gold);}
+
+/* ARTICLE */
+.article-wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:110px 40px 100px;}
+
+/* HERO */
+.art-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.art-kicker::before{content:'──';color:var(--text-lo);}
+.art-title{font-family:var(--serif);font-size:clamp(30px,5vw,48px);color:var(--text-hi);line-height:1.12;letter-spacing:-.01em;margin-bottom:24px;font-weight:400;}
+.art-meta{display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:var(--text-lo);margin-bottom:48px;flex-wrap:wrap;}
+.art-meta span{display:flex;align-items:center;gap:6px;}
+.art-hr{width:100%;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:52px;}
+
+/* PROSE */
+.prose p{font-size:16px;color:var(--text);line-height:1.85;margin-bottom:24px;font-weight:300;}
+.prose h2{font-family:var(--serif);font-size:26px;color:var(--text-hi);margin:52px 0 18px;font-weight:400;letter-spacing:-.01em;}
+.prose h3{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin:36px 0 14px;}
+.prose strong{color:var(--text-hi);font-weight:500;}
+.prose em{font-style:italic;color:var(--text-hi);}
+.prose a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,168,83,.3);transition:border-color .15s;}
+.prose a:hover{border-color:var(--gold);}
+.prose ul{list-style:none;margin:0 0 24px;display:flex;flex-direction:column;gap:10px;}
+.prose ul li{padding-left:22px;position:relative;font-size:15px;color:var(--text);line-height:1.75;font-weight:300;}
+.prose ul li::before{content:'→';position:absolute;left:0;color:var(--gold);font-family:var(--mono);font-size:12px;top:3px;}
+.prose blockquote{margin:32px 0;padding:16px 22px;border-left:2px solid var(--gold);background:rgba(212,168,83,.05);font-family:var(--mono);font-size:13px;color:var(--gold);line-height:1.7;}
+.prose code{font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--sky);padding:2px 7px;border:1px solid var(--border-hi);}
+
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;margin:32px 0;}
+.data-table th{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);padding:10px 14px;border-bottom:1px solid var(--border-hi);text-align:left;}
+.data-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text-lo);}
+.data-table .win{color:var(--green);}
+.data-table .base{color:var(--rose);}
+.data-table tbody tr:hover{background:var(--surface);}
+
+/* CALLOUT */
+.callout{padding:18px 22px;border:1px solid var(--border-hi);background:var(--surface);margin:32px 0;font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.7;}
+.callout .cl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+
+/* CHIP */
+.chip{font-family:var(--mono);font-size:10px;padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid var(--border-hi);color:var(--text-lo);display:inline-block;margin:2px;}
+
+/* PREV/NEXT */
+.post-nav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-top:80px;}
+.pn-item{background:var(--surface);padding:22px 26px;text-decoration:none;transition:background .2s;}
+.pn-item:hover{background:var(--surface2);}
+.pn-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-lo);margin-bottom:8px;}
+.pn-title{font-family:var(--sans);font-size:14px;color:var(--text-hi);line-height:1.35;font-weight:400;}
+.pn-item.next{text-align:right;}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 52px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-lo);}
+@media(max-width:700px){nav{padding:0 18px;}.article-wrap{padding:90px 20px 60px;}footer{padding:16px 20px;flex-direction:column;gap:8px;}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<nav>
+  <a class="logo" href="../index.html"><em>~/</em>shreya-k</a>
+  <a class="nav-back" href="../index.html#blog">← Back to site</a>
+</nav>
+
+<div class="article-wrap">
+  <div class="art-kicker">Research · VLA · CMSC 848K</div>
+  <h1 class="art-title">TMI: Teaching OpenVLA<br>to Ignore the Fluff</h1>
+  <div class="art-meta">
+    <span>2025</span>
+    <span>Shreya Kalyanaraman &amp; Kunj Golwala</span>
+    <span>~10 min read</span>
+    <span><a href="https://drive.google.com/drive/folders/1TzSCYKKccH5_FjAM-6BKAuFjvwQy2-n0" target="_blank" style="color:var(--gold)">Slides ↗</a></span>
+  </div>
+  <div class="art-hr"></div>
+
+  <div class="prose">
+
+    <h2>The Problem</h2>
+    <p>Vision-Language-Action models like OpenVLA map vision and language directly to robot actions. They're trained on clean, structured instruction datasets — things like <code>"pick up the alphabet soup and place it in the basket"</code>.</p>
+    <p>But real human instructions don't look like that. People say things like: <em>"Okay, let's try the alphabet soup. Can you pick it up and put it in the basket? Try not to knock anything over while you're at it."</em></p>
+    <p>Same goal. Very different language. We wanted to know: <strong>how badly does this break OpenVLA, and what can we do about it?</strong></p>
+
+    <h2>What We Built</h2>
+    <h3>Language Perturbation Dataset</h3>
+    <p>We created four instruction variants for each task in the LIBERO Object and Spatial suites, preserving the object, goal, and action — only changing the language form:</p>
+    <ul>
+      <li><strong>Clean</strong> — "pick up the alphabet soup and place it in the basket"</li>
+      <li><strong>Paraphrased</strong> — "Take the alphabet soup and drop it in the basket"</li>
+      <li><strong>Conversational</strong> — "Could you please pick up the alphabet soup and place it in the basket?"</li>
+      <li><strong>Noisy</strong> — "Okay, lets try the alphabet soup. Can you pick it up and put it in the basket? Try not to knock anything over while you're at it."</li>
+    </ul>
+    <p>Perturbations were generated with Gemini under strict constraints: the object, target, and action must be preserved. Only the linguistic surface form changes.</p>
+
+    <h3>Two Approaches to Robustness</h3>
+    <p>We compared two very different fixes:</p>
+    <ul>
+      <li><strong>External LLM Filtering</strong> — a LLaMA-3.1-8B-Instruct model preprocessing instructions before they reach OpenVLA, stripping the noise and returning a canonical command string. No retraining of OpenVLA.</li>
+      <li><strong>Internal LoRA Fine-tuning</strong> — training lightweight LoRA adapters on OpenVLA itself, using a perturbed instruction dataset, so the model learns to handle noise internally.</li>
+    </ul>
+
+    <h2>Baseline: How Bad Is It?</h2>
+    <p>The results were stark. On LIBERO Object tasks, OpenVLA with clean instructions achieves <strong>69% success</strong>. Under noisy instructions, that drops to <strong>17.5%</strong> — a 75% relative drop in performance. Same robot. Same task. Just different words.</p>
+
+    <table class="data-table">
+      <thead><tr><th>Suite</th><th>Instruction Type</th><th>Success Rate</th></tr></thead>
+      <tbody>
+        <tr><td>libero_spatial</td><td>Clean</td><td>82.5%</td></tr>
+        <tr><td>libero_spatial</td><td>Paraphrased</td><td>68.75%</td></tr>
+        <tr><td>libero_object</td><td>Clean</td><td>69%</td></tr>
+        <tr><td>libero_object</td><td>Paraphrased</td><td>56.75%</td></tr>
+        <tr><td>libero_object</td><td>Conversational</td><td>64.0%</td></tr>
+        <tr><td>libero_object</td><td>Noisy</td><td class="base">17.5%</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Method 1: External LLM Filtering</h2>
+    <p>We used LLaMA-3.1-8B-Instruct as a preprocessing step. The system prompt instructs it to act as a "robotic command simplifier" — convert any noisy instruction into a single canonical command of the form <code>"pick up [object] and place it in [target]"</code>.</p>
+    <p>We compared one-shot vs few-shot prompting. Few-shot consistently performed better, giving the model concrete examples of the transformation we wanted.</p>
+
+    <div class="callout">
+      <div class="cl">System Prompt (One-shot)</div>
+      You are a robotic command simplifier. Convert the input into a single strict command: "pick up [object] and place it in [target]". Remove all fluff, politeness, and urgency. Standardize verbs to "pick up" and "place". Output ONLY the clean command string.
+    </div>
+
+    <h3>Filtering Results</h3>
+    <table class="data-table">
+      <thead><tr><th>Noise Type</th><th>Baseline</th><th>Filter (1-shot)</th><th>Filter (few-shot)</th></tr></thead>
+      <tbody>
+        <tr><td>Paraphrased</td><td>56.75%</td><td>67.75%</td><td class="win">69.00%</td></tr>
+        <tr><td>Conversational</td><td>64.00%</td><td>69.00%</td><td class="win">69.00%</td></tr>
+        <tr><td>Noisy</td><td class="base">17.50%</td><td>58.75%</td><td class="win">64.75%</td></tr>
+      </tbody>
+    </table>
+    <p>Few-shot filtering recovers nearly all performance — <strong>+47.25 percentage points</strong> on noisy instructions, reaching 64.75%. For conversational and paraphrased instructions it reaches or matches the clean baseline entirely. No retraining required.</p>
+
+    <h2>Method 2: LoRA Fine-tuning</h2>
+    <p>We froze the base OpenVLA weights and trained LoRA adapters on demonstrations paired with perturbed instructions. We compared two adapter placements — linear (FFN) layers vs attention (q, k, v, o) projections — and two learning rate schedules.</p>
+    <p>Training was constrained by GPU memory (batch size ≤ 2–4, gradient accumulation up to 32 steps), limiting us to 4 epochs.</p>
+
+    <table class="data-table">
+      <thead><tr><th>LoRA Target</th><th>L1 Loss</th><th>Action Accuracy</th><th>Converged?</th></tr></thead>
+      <tbody>
+        <tr><td>All Linear (constant LR)</td><td>0.0266</td><td>72.99%</td><td>No</td></tr>
+        <tr><td>All Linear (cosine LR)</td><td>0.0264</td><td>68.1%</td><td>No</td></tr>
+        <tr><td>Attention (cosine LR)</td><td>0.1751</td><td>43.97%</td><td>Yes</td></tr>
+        <tr><td>Attention (constant LR)</td><td>0.1481</td><td>40.18%</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+
+    <p>Linear-layer LoRA improved paraphrased instruction success from <strong>56.75% → 61.25%</strong> — a real improvement, but modest. The attention-layer LoRA converged cleanly in training but produced degenerate policies at rollout time — a reminder that training loss is not rollout success.</p>
+
+    <h2>What This Means</h2>
+    <p>Filtering won. Under limited compute, modular LLM instruction filtering is more effective and more reliable than internal LoRA adaptation. It requires no retraining, adds minimal latency, and generalizes to any noise type.</p>
+    <p>That said, LoRA is the right long-term direction — a model that's inherently robust to noise is better than one that requires a preprocessing pipeline. It just needs more compute, larger effective batch sizes, and longer training horizons than we had access to.</p>
+
+    <div class="callout">
+      <div class="cl">Key Takeaway</div>
+      VLAs are brittle to language surface form in ways that don't get enough attention. If you're deploying a VLA system where users give instructions naturally, you need to account for this — either with instruction preprocessing or fine-tuning on realistic data.
+    </div>
+
+    <h3>Future Directions</h3>
+    <ul>
+      <li>Combining LLM filtering + LoRA for best of both worlds</li>
+      <li>Longer LoRA training with larger effective batch sizes</li>
+      <li>Real-robot evaluation beyond LIBERO simulation</li>
+      <li>Studying whether noise robustness generalizes across task suites</li>
+    </ul>
+
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:36px">
+      <span class="chip">OpenVLA</span><span class="chip">LoRA</span><span class="chip">LLaMA-3.1-8B</span><span class="chip">LIBERO</span><span class="chip">PyTorch</span><span class="chip">SigLIP</span><span class="chip">Instruction Robustness</span>
+    </div>
+  </div>
+
+  <nav class="post-nav">
+    <a class="pn-item" href="attention.html">
+      <div class="pn-label">← Next Post</div>
+      <div class="pn-title">Attention is All You Need — and Why It Matters for Robotics</div>
+    </a>
+    <a class="pn-item next" href="vla-limits.html">
+      <div class="pn-label">Also →</div>
+      <div class="pn-title">What Dexterous Manipulation Actually Needs</div>
+    </a>
+  </nav>
+</div>
+
+<footer>
+  <span>© 2025 Shreya Kalyanaraman</span>
+  <a href="../index.html" style="color:var(--gold);text-decoration:none;">← Back to portfolio</a>
+</footer>
+
+<script>
+const c=document.getElementById('cur'),r=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.left=mx-4+'px';c.style.top=my-4+'px';});
+(function l(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx-16+'px';r.style.top=ry-16+'px';requestAnimationFrame(l);})();
+document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{c.style.transform='scale(2.5)';r.style.borderColor='rgba(212,168,83,.65)';});el.addEventListener('mouseleave',()=>{c.style.transform='scale(1)';r.style.borderColor='rgba(212,168,83,.28)';});});
+</script>
+</body>
+</html>
