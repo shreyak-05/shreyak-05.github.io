@@ -1060,7 +1060,7 @@ footer::before {
         <span class="pc-num">01</span>
         <div class="pc-header-main">
           <div class="pc-type-row"><span class="pc-badge pb-research">Research</span></div>
-          <div class="pc-name">Variational Neural Belief Parameterizations for Robust Dexterous Grasping under Multimodal Uncertainty</div>
+          <div class="pc-name">Probabilistic Grasping with Multimodal Uncertainty</div>
         </div>
         <div class="pc-toggle">+</div>
       </div>
@@ -1070,14 +1070,25 @@ footer::before {
             <p class="pc-desc">A probabilistic grasping framework using variational inference to model multimodal uncertainty over object pose, contact geometry, and success probability. Rather than committing to a single grasp configuration, the system maintains a distribution over grasps — enabling robustness to sensor noise and occlusion that causes deployed humanoid systems to fail in unstructured environments.</p>
             <div class="pc-result">↑ Robust grasp success under multimodal uncertainty · Cross-geometry generalization</div>
             <div class="pc-stack">
-              <span class="chip">Variational Inference</span><span class="chip">PyTorch</span><span class="chip">MuJoCo</span><span class="chip">RealHand L6</span><span class="chip">Grasp Synthesis</span><span class="chip">Multimodal Perception</span>
+              <span class="chip">Variational Inference</span><span class="chip">PyTorch</span><span class="chip">MuJoCo</span><span class="chip">RealHand L6</span><span class="chip">Grasp Synthesis</span>
             </div>
             <div class="pc-links">
               <!-- <a href="#">[IROS 2026 — Under Review]</a> -->
               <a href="#">[Preprint — Coming Soon]</a>
             </div>
           </div>
-          <div class="pc-aside"></div>
+          <div class="pc-aside" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div class="demo-thumb" onclick="openModal('https://drive.google.com/file/d/17kcJBstsx74fKLpXteqcHyaehnJh-BZv/preview')">
+              <span class="demo-thumb-label">WATCH</span>
+              <div class="demo-thumb-box" style="width:160px;height:160px;">
+                <img src="assets/grasping.png" style="width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+                <div class="demo-thumb-play">
+                  <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+              </div>
+              <span class="demo-thumb-filename">GRASPING.MOV</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1100,23 +1111,23 @@ footer::before {
             <div class="pc-stack">
               <span class="chip">Meta Quest 3</span><span class="chip">ROS2</span><span class="chip">Python</span><span class="chip">RealHand L6</span><span class="chip">Bilateral Control</span>
             </div>
-            <div class="pc-links">
+            <!-- <div class="pc-links">
               <a href="https://github.com/shreyak-05" target="_blank">[GitHub]</a>
-            </div>
+            </div> -->
           </div>
           <!-- <div class="pc-aside" style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-start;padding-top:4px;"> -->
-          <div class="pc-aside" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <!-- <div class="pc-aside" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
             <div class="demo-thumb" onclick="openModal('https://drive.google.com/file/d/1qpZFUrhzuCMRfc1jNyGx8l5Gfw5M9aKs/preview')">
               <span class="demo-thumb-label">WATCH</span>
               <div class="demo-thumb-box" style="width:160px;height:160px;">
-                <img src="assets/barista.png" style="width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+                <img src="assets/teleop.png" style="width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
                 <div class="demo-thumb-play">
                   <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
                 </div>
               </div>
               <span class="demo-thumb-filename">TELEOP.MOV</span>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -1141,10 +1152,21 @@ footer::before {
             </div>
             <div class="pc-links">
               <a href="#">[Course Paper]</a>
-              <a href="https://github.com/shreyak-05" target="_blank">[GitHub]</a>
+              <a href="https://github.com/sellahy/HeadlessLAPO" target="_blank">[GitHub]</a>
             </div>
           </div>
-          <div class="pc-aside"></div>
+          <div class="pc-aside" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div class="demo-thumb" onclick="openModal('https://drive.google.com/file/d/1wTPzz_frJr90V3C0V9umQHgRTr9NcFLx/preview')">
+              <span class="demo-thumb-label">WATCH</span>
+              <div class="demo-thumb-box" style="width:160px;height:160px;">
+                <img src="assets/lapo.png" style="width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+                <div class="demo-thumb-play">
+                  <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+              </div>
+              <span class="demo-thumb-filename">LAPO.MOV</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1168,8 +1190,8 @@ footer::before {
               <span class="chip">OpenVLA</span><span class="chip">LoRA</span><span class="chip">LLaMA-3.1-8B</span><span class="chip">LIBERO</span><span class="chip">PyTorch</span><span class="chip">SigLIP</span>
             </div>
             <div class="pc-links">
-              <a href="https://drive.google.com/drive/folders/1TzSCYKKccH5_FjAM-6BKAuFjvwQy2-n0" target="_blank">[Slides]</a>
-              <a href="https://github.com/shreyak-05" target="_blank">[GitHub]</a>
+              <a href="https://docs.google.com/presentation/d/1FqJEjvdQ4FLIEeJGnmxyhos8jbwIJOozf7YXEyJJzgI/edit?usp=sharing" target="_blank">[Slides]</a>
+              <a href="https://github.com/kunj1302/tmi_openvla" target="_blank">[GitHub]</a>
               <a href="blog/tmi.html">[Full Writeup →]</a>
             </div>
           </div>
@@ -1186,7 +1208,7 @@ footer::before {
       </div>
     </div>
 
-    <!-- 05 Pi0 -->
+    <!-- 05 Pi0
     <div class="pc">
       <div class="pc-header">
         <span class="pc-num">05</span>
@@ -1211,7 +1233,7 @@ footer::before {
           <div class="pc-aside"></div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- 06 LeRobot -->
     <div class="pc">
@@ -1235,7 +1257,18 @@ footer::before {
               <a href="https://github.com/zahirmahammad/act" target="_blank">[GitHub]</a>
             </div>
           </div>
-          <div class="pc-aside"></div>
+          <div class="pc-aside" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div class="demo-thumb" onclick="openModal('https://drive.google.com/file/d/1sLgKc0H_uugawZ3tAcv_6dGQDKU1-Q5E/preview')">
+              <span class="demo-thumb-label">WATCH</span>
+              <div class="demo-thumb-box" style="width:160px;height:160px;">
+                <img src="assets/act.png" style="width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+                <div class="demo-thumb-play">
+                  <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+              </div>
+              <span class="demo-thumb-filename">ACT.MOV</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1262,7 +1295,18 @@ footer::before {
               <a href="https://github.com/shreyak-05/Carla_PPO_DDPG" target="_blank">[GitHub]</a>
             </div>
           </div>
-          <div class="pc-aside"></div>
+          <div class="pc-aside" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div class="demo-thumb" onclick="openModal('https://drive.google.com/file/d/1RVonL0lxxUhHdDfi2fygz3oOlwy7Lg_P/preview')">
+              <span class="demo-thumb-label">WATCH</span>
+              <div class="demo-thumb-box" style="width:160px;height:160px;">
+                <img src="assets/ppo.png" style="width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+                <div class="demo-thumb-play">
+                  <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+              </div>
+              <span class="demo-thumb-filename">PPO.MOV</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1286,10 +1330,21 @@ footer::before {
               <span class="chip">ROS2</span><span class="chip">Gazebo</span><span class="chip">UR10e</span><span class="chip">MoveIt</span><span class="chip">IVK</span><span class="chip">RViz</span>
             </div>
             <div class="pc-links">
-              <a href="https://github.com/shreyak-05/BARISTA-ROBOT" target="_blank">[GitHub]</a>
+              <a href="https://github.com/GraysonGilbert/barista_robot" target="_blank">[GitHub]</a>
             </div>
           </div>
-          <div class="pc-aside"></div>
+          <div class="pc-aside" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div class="demo-thumb" onclick="openModal('https://drive.google.com/file/d/1qpZFUrhzuCMRfc1jNyGx8l5Gfw5M9aKspreview')">
+              <span class="demo-thumb-label">WATCH</span>
+              <div class="demo-thumb-box" style="width:160px;height:160px;">
+                <img src="assets/barista.png" style="width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+                <div class="demo-thumb-play">
+                  <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+              </div>
+              <span class="demo-thumb-filename">BARISTA.MOV</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
