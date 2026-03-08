@@ -1679,9 +1679,9 @@ document.querySelectorAll('.demo-trigger').forEach(a=>{
   a.addEventListener('click',e=>{ e.preventDefault(); const src=a.dataset.src; if(src) openModal(src); });
 });
 // For demo links without data-src — show placeholder message until user adds real URL
-document.querySelectorAll('[id^="demo-link"]').forEach(a=>{
-  a.addEventListener('click',e=>{ e.preventDefault(); alert('Add your demo video URL to the data-src attribute of this link.'); });
-});
+// document.querySelectorAll('[id^="demo-link"]').forEach(a=>{
+//   a.addEventListener('click',e=>{ e.preventDefault(); alert('Add your demo video URL to the data-src attribute of this link.'); });
+// });
 
 // ── HERO TERMINAL ─────────────────────────────
 (function(){
