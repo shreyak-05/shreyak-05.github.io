@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acting Across Action Spaces · Shreya Kalyanaraman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#070b10;--surface:#0c1219;--surface2:#101922;--border:#1a2535;--border-hi:#243448;
+  --gold:#d4a853;--gold-dim:rgba(212,168,83,.1);--violet:#a78bfa;--rose:#f9a8d4;
+  --sky:#7dd3fc;--green:#6ee7b7;
+  --text:#7a9ab5;--text-lo:#2a3f55;--text-hi:#c8dff0;
+  --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--serif:'DM Serif Display',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.8;overflow-x:hidden;cursor:none;font-size:16px;}
+#cur{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .1s;}
+#cur-ring{width:32px;height:32px;border:1px solid rgba(212,168,83,.28);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:left .12s ease,top .12s ease;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(212,168,83,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,.012) 1px,transparent 1px);background-size:48px 48px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:54px;padding:0 52px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,11,16,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--mono);font-size:13px;color:var(--gold);text-decoration:none;letter-spacing:.05em;}
+.logo em{color:var(--text-lo);font-style:normal;}
+.nav-back{font-family:var(--mono);font-size:11px;color:var(--text-lo);text-decoration:none;letter-spacing:.1em;transition:color .15s;display:flex;align-items:center;gap:6px;}
+.nav-back:hover{color:var(--gold);}
+.article-wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:110px 40px 100px;}
+.art-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.art-kicker::before{content:'──';color:var(--text-lo);}
+.art-title{font-family:var(--serif);font-size:clamp(30px,5vw,48px);color:var(--text-hi);line-height:1.12;letter-spacing:-.01em;margin-bottom:24px;font-weight:400;}
+.art-meta{display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:var(--text-lo);margin-bottom:48px;flex-wrap:wrap;}
+.art-meta span{display:flex;align-items:center;gap:6px;}
+.art-hr{width:100%;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:52px;}
+.prose p{font-size:16px;color:var(--text);line-height:1.85;margin-bottom:24px;font-weight:300;}
+.prose h2{font-family:var(--serif);font-size:26px;color:var(--text-hi);margin:52px 0 18px;font-weight:400;letter-spacing:-.01em;}
+.prose h3{font-family:var(--mono);font-size:13px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin:36px 0 14px;}
+.prose strong{color:var(--text-hi);font-weight:500;}
+.prose em{font-style:italic;color:var(--text-hi);}
+.prose a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,168,83,.3);transition:border-color .15s;}
+.prose a:hover{border-color:var(--gold);}
+.prose ul{list-style:none;margin:0 0 24px;display:flex;flex-direction:column;gap:10px;}
+.prose ul li{padding-left:22px;position:relative;font-size:15px;color:var(--text);line-height:1.75;font-weight:300;}
+.prose ul li::before{content:'→';position:absolute;left:0;color:var(--gold);font-family:var(--mono);font-size:12px;top:3px;}
+.prose blockquote{margin:32px 0;padding:16px 22px;border-left:2px solid var(--gold);background:rgba(212,168,83,.05);font-family:var(--mono);font-size:13px;color:var(--gold);line-height:1.7;}
+.prose code{font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--sky);padding:2px 7px;border:1px solid var(--border-hi);}
+.data-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;margin:32px 0;}
+.data-table th{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);padding:10px 14px;border-bottom:1px solid var(--border-hi);text-align:left;}
+.data-table td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--text-lo);vertical-align:top;}
+.data-table .win{color:var(--green);}
+.data-table .base{color:var(--rose);}
+.data-table tbody tr:hover{background:var(--surface);}
+.callout{padding:18px 22px;border:1px solid var(--border-hi);background:var(--surface);margin:32px 0;font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.7;}
+.callout .cl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.diagram{padding:22px;border:1px solid var(--border-hi);background:linear-gradient(180deg,rgba(255,255,255,.01),transparent),var(--surface);margin:28px 0;font-family:var(--mono);font-size:13px;color:var(--text-hi);line-height:1.8;overflow:auto;}
+.chip{font-family:var(--mono);font-size:10px;padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid var(--border-hi);color:var(--text-lo);display:inline-block;margin:2px;}
+.post-nav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-top:80px;}
+.pn-item{background:var(--surface);padding:22px 26px;text-decoration:none;transition:background .2s;}
+.pn-item:hover{background:var(--surface2);}
+.pn-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-lo);margin-bottom:8px;}
+.pn-title{font-family:var(--sans);font-size:14px;color:var(--text-hi);line-height:1.35;font-weight:400;}
+.pn-item.next{text-align:right;}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 52px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-lo);}
+@media(max-width:700px){nav{padding:0 18px;}.article-wrap{padding:90px 20px 60px;}footer{padding:16px 20px;flex-direction:column;gap:8px;}.post-nav{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<nav>
+  <a class="logo" href="../index.html"><em>~/</em>shreya-k</a>
+  <a class="nav-back" href="../index.html#blog">← Back to site</a>
+</nav>
+
+<div class="article-wrap">
+  <div class="art-kicker">Research · Reinforcement Learning · CMSC 848N</div>
+  <h1 class="art-title">Acting Across Action Spaces</h1>
+  <div class="art-meta">
+    <span>2025</span>
+    <span>Shreya Kalyanaraman &amp; Sahire Ellahy</span>
+    <span>~9 min read</span>
+  </div>
+  <div class="art-hr"></div>
+
+  <div class="prose">
+    <h2>The Problem</h2>
+    <p>Most reinforcement learning policies are architecturally tied to the action space they were trained in. A policy might learn to act well in one environment, but the moment the action set changes, the whole setup often stops transferring cleanly.</p>
+    <p>That limitation matters if we care about agents that generalize. In robotics, the same high-level task can show up with different control interfaces, different embodiments, or different low-level primitives. In games and benchmark environments, the task structure may stay similar while the available actions shift just enough to break a policy trained in a fixed-action regime.</p>
+    <p>We wanted to explore a simple question: <strong>can a policy learn to operate in a latent action space and then adapt to a new environment by learning only the decoder at test time?</strong></p>
+
+    <h2>The Paper That Motivated This</h2>
+    <p>Our starting point was <em>Learning to Act Without Actions</em>, which reframes action learning around <strong>latent action representations</strong>. Instead of treating actions as fixed labels, the paper uses an <strong>inverse dynamics model</strong> to infer action embeddings from state transitions. That means the model learns from how the world changes, not just from explicit action tokens.</p>
+    <p>The key idea is elegant: if the environment transitions from <code>s_t</code> to <code>s_{t+1}</code>, some action must have caused that change. An inverse dynamics model can map those transitions into a vector in latent action space, and a policy can then learn to predict latent actions instead of directly predicting a hard-coded action index.</p>
+    <p>What we found compelling was not just the latent-action formulation itself, but the possibility that it could serve as a bridge across environments with different action sets.</p>
+
+    <h2>Our Extension: Acting Across Action Spaces</h2>
+    <p>We extended that idea to a transfer setting. Instead of only asking whether latent actions can support policy learning, we asked whether they can support <strong>adaptation across multiple action spaces</strong>.</p>
+    <p>We consider a family of environments that share task structure but differ in available actions. The goal is to train a policy that outputs a latent action vector, then uses a decoder to map that vector to one of the actions available in the current environment.</p>
+    <p>In other words, rather than relearning the full policy every time the action space changes, we try to preserve the internal policy and adapt only the mapping from latent space to the environment's actions.</p>
+
+    <div class="diagram">
+      Current state <code>s_t</code><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      Transformer policy <code>π_i</code><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      Predicted latent action <code>ẑ_t</code><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      Cosine-similarity decoder against available action embeddings <code>{z_a}</code><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      Environment-specific action <code>a ∈ A</code>
+    </div>
+
+    <h2>Method</h2>
+    <h3>Inverse Dynamics Model</h3>
+    <p>For each action, we collect <strong>SAS tuples</strong>: consecutive state pairs where that action was taken between them. The inverse dynamics model consumes those state transitions and produces a latent vector <code>z_a</code> representing the action.</p>
+    <p>That gives us a learned embedding for each available action in an environment. These latent vectors are meant to capture functional similarities between actions, instead of treating every action as unrelated and discrete.</p>
+
+    <h3>Policy</h3>
+    <p>The policy is a transformer-based reinforcement learning agent. At each timestep it takes the current state, the available action set, and the corresponding latent action embeddings. It then predicts a latent vector <code>ẑ_t</code>.</p>
+    <p>The final action is chosen using a non-learned decoder: whichever action embedding has the highest cosine similarity to <code>ẑ_t</code> gets executed.</p>
+
+    <h3>Training</h3>
+    <p>We train the policy and inverse dynamics model jointly. The policy is optimized for return, while the inverse dynamics model is optimized to make the policy choose the correct latent embedding for the action taken. In practice, training alternates between policy updates and inverse-dynamics updates.</p>
+
+    <div class="callout">
+      <div class="cl">Core Idea</div>
+      Keep the policy's internal decision-making in latent space, and adapt to a new environment by rebuilding the decoder over that environment's actions instead of retraining the whole policy.
+    </div>
+
+    <h2>What We Implemented</h2>
+    <p>We implemented a LAPO-style setup in a multi-environment setting and trained across multiple environments rather than only treating each environment independently. The main experiment was designed to test whether a model trained in this way could adapt to a new environment by learning a decoder at test time.</p>
+    <p>Concretely, we trained on all environments except <strong>Bigfish</strong>. Then we learned a decoder for Bigfish as an <strong>unseen</strong> environment at test time. We also learned a decoder for <strong>Plunder</strong>, which served as a <strong>seen</strong> environment sanity check under the same overall training setup.</p>
+
+    <h2>Results</h2>
+    <p>The main pattern was what we would expect from a sensible transfer setup: <strong>performance in the seen environment was better than performance in the unseen one</strong>. That is, when we evaluated in Plunder, which the model had already seen during training, performance was stronger than when adapting to Bigfish, which had been held out.</p>
+    <p>This matters because it tells us two things. First, the setup is not behaving randomly: the model retains useful environment-specific structure. Second, adaptation to an unseen environment is possible, but harder. That is exactly the regime we care about if the goal is transfer across action spaces rather than memorization of a single environment.</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Setting</th><th>Environment Status</th><th>What It Tests</th><th>Observation</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Train on all except Bigfish, then learn decoder for Bigfish</td>
+          <td>Unseen</td>
+          <td>Adaptation to a held-out environment</td>
+          <td class="base">Harder; lower performance</td>
+        </tr>
+        <tr>
+          <td>Train on all except Bigfish, then learn decoder for Plunder</td>
+          <td>Seen</td>
+          <td>Sanity check under the same training setup</td>
+          <td class="win">Better performance</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>We also started thinking about a more meaningful comparison than raw return alone, since reward scales may differ across environments. That makes direct visual comparison less clean than we'd like. The broader point, though, is already visible: a shared latent policy with an environment-specific decoder can act in both seen and unseen environments, but generalization to unseen settings remains the harder problem.</p>
+
+    <h2>Why This Is Interesting</h2>
+    <p>What I like about this direction is that it separates <strong>decision-making</strong> from <strong>action-space realization</strong>. The policy does not need to be rewritten every time the action vocabulary changes. Instead, it learns to think in a latent space and then grounds that latent action through a decoder for the environment it is currently in.</p>
+    <p>That idea feels especially relevant to robotics. Different embodiments may expose different actions while still sharing a task-level objective. If latent actions can support adaptation in benchmark environments, the next question is whether the same idea can scale to robot control where actions vary with morphology, kinematics, or controller design.</p>
+
+    <h2>Limitations</h2>
+    <p>Latent actions are not a magic fix. They can be hard to interpret, and there is always the risk that the learned space captures shortcuts rather than meaningful action structure. More broadly, strong performance in a seen environment does not automatically translate to robust transfer in a truly novel one.</p>
+    <p>That tension is part of what makes this direction interesting. The question is not whether latent actions are perfect, but whether they provide a useful abstraction for transfer when action spaces differ.</p>
+
+    <h2>Future Work</h2>
+    <p>The next step is to move this idea closer to robotics. Procgen-style experiments are useful for testing the abstraction, but the setting I actually care about is <strong>cross-embodiment transfer</strong>.</p>
+    <p>That means implementing this framework in <strong>Isaac Lab</strong> or <strong>MuJoCo</strong>, where the same task can be attempted by different robots with different action spaces. If the latent-action formulation holds up there, it becomes much more relevant to real robot learning.</p>
+    <ul>
+      <li>Evaluate latent-action decoding across different robot embodiments</li>
+      <li>Test whether multi-environment training helps adaptation in held-out robotic settings</li>
+      <li>Compare latent actions against more structured alternatives like hierarchical planning or options</li>
+    </ul>
+
+    <div class="callout">
+      <div class="cl">Takeaway</div>
+      Policies usually break when the action space changes. This project explores whether a latent-action policy can preserve what it has learned and adapt by relearning only the decoder.
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:36px">
+      <span class="chip">Reinforcement Learning</span><span class="chip">Latent Actions</span><span class="chip">Transfer Learning</span><span class="chip">Procgen</span><span class="chip">Robot Learning</span><span class="chip">CMSC 848N</span>
+    </div>
+  </div>
+
+  <nav class="post-nav">
+    <a class="pn-item" href="lapo.html">
+      <div class="pn-label">← Next Post</div>
+      <div class="pn-title">Learning to Act Without Actions — What Actually Matters</div>
+    </a>
+    <a class="pn-item next" href="cross-embodiment.html">
+      <div class="pn-label">Also →</div>
+      <div class="pn-title">Why Cross-Embodiment Transfer Is Harder Than It Sounds</div>
+    </a>
+  </nav>
+</div>
+
+<footer>
+  <span>© 2025 Shreya Kalyanaraman</span>
+  <a href="../index.html" style="color:var(--gold);text-decoration:none;">← Back to portfolio</a>
+</footer>
+
+<script>
+const c=document.getElementById('cur'),r=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.left=mx-4+'px';c.style.top=my-4+'px';});
+(function l(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx-16+'px';r.style.top=ry-16+'px';requestAnimationFrame(l);})();
+document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{c.style.transform='scale(2.5)';r.style.borderColor='rgba(212,168,83,.65)';});el.addEventListener('mouseleave',()=>{c.style.transform='scale(1)';r.style.borderColor='rgba(212,168,83,.28)';});});
+</script>
+</body>
+</html>
