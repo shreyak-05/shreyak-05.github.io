@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Residual SAC for Keyed Peg Insertion · Shreya Kalyanaraman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b10;--surface:#0c1219;--surface2:#101922;--border:#1a2535;--border-hi:#243448;--gold:#d4a853;--violet:#a78bfa;--rose:#f9a8d4;--sky:#7dd3fc;--green:#6ee7b7;--text:#b6cadd;--text-lo:#7f96ad;--text-hi:#eef7ff;--mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--serif:'DM Serif Display',serif;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.8;overflow-x:hidden;cursor:none;font-size:16px;}
+#cur{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .1s;}
+#cur-ring{width:32px;height:32px;border:1px solid rgba(212,168,83,.28);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:left .12s ease,top .12s ease;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(212,168,83,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,83,.012) 1px,transparent 1px);background-size:48px 48px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:54px;padding:0 52px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,11,16,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+.logo{font-family:var(--mono);font-size:13px;color:var(--gold);text-decoration:none;letter-spacing:.05em;}.logo em{color:var(--text-lo);font-style:normal;}
+.nav-back{font-family:var(--mono);font-size:11px;color:var(--text-lo);text-decoration:none;letter-spacing:.1em;transition:color .15s;}.nav-back:hover{color:var(--gold);}
+.article-wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:110px 40px 100px;}
+.art-kicker{font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:10px;}.art-kicker::before{content:'──';color:var(--text-lo);}
+.art-title{font-family:var(--serif);font-size:clamp(30px,5vw,48px);color:var(--text-hi);line-height:1.12;letter-spacing:-.01em;margin-bottom:24px;font-weight:400;}
+.art-meta{display:flex;gap:20px;font-family:var(--mono);font-size:11px;color:var(--text-lo);margin-bottom:48px;flex-wrap:wrap;}.art-hr{width:100%;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:52px;}
+.prose p{font-size:16px;color:var(--text);line-height:1.85;margin-bottom:24px;font-weight:400;}.prose h2{font-family:var(--serif);font-size:26px;color:var(--text-hi);margin:52px 0 18px;font-weight:400;}.prose h3{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:36px 0 14px;}.prose strong{color:var(--text-hi);font-weight:500;}.prose em{font-style:italic;color:var(--text-hi);}.prose a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,168,83,.35);}.prose a:hover{color:var(--text-hi);border-bottom-color:var(--gold);}.prose code{font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--sky);padding:2px 7px;border:1px solid var(--border-hi);}
+.prose ul{list-style:none;margin:0 0 24px;display:flex;flex-direction:column;gap:10px;}.prose ul li{padding-left:22px;position:relative;font-size:15px;color:var(--text);line-height:1.75;font-weight:400;}.prose ul li::before{content:'→';position:absolute;left:0;color:var(--gold);font-family:var(--mono);font-size:12px;top:3px;}
+.callout{padding:18px 22px;border:1px solid var(--border-hi);background:var(--surface);margin:32px 0;font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.7;}.callout .cl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.diagram{padding:22px;border:1px solid var(--border-hi);background:linear-gradient(180deg,rgba(255,255,255,.01),transparent),var(--surface);margin:28px 0;font-family:var(--mono);font-size:13px;color:var(--text-hi);line-height:1.8;overflow:auto;}
+.video-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:30px 0;}.vid-card{border:1px solid var(--border-hi);background:var(--surface);padding:12px;}.vid-card video{width:100%;display:block;border:1px solid var(--border);background:#000;}.vid-title{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:10px 0 6px;}.vid-caption{font-family:var(--sans);font-size:13px;line-height:1.55;color:var(--text);font-weight:400;}@media(max-width:700px){.video-grid{grid-template-columns:1fr;}}
+.data-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;margin:32px 0;}.data-table th{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);padding:10px 12px;border-bottom:1px solid var(--border-hi);text-align:left;}.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}.data-table .win{color:var(--green);}.data-table .base{color:var(--rose);}.data-table tbody tr:hover{background:var(--surface);}
+.chip{font-family:var(--mono);font-size:10px;padding:3px 9px;background:rgba(255,255,255,.02);border:1px solid var(--border-hi);color:var(--text-lo);display:inline-block;margin:2px;}
+.post-nav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-top:80px;}.pn-item{background:var(--surface);padding:22px 26px;text-decoration:none;transition:background .2s;}.pn-item:hover{background:var(--surface2);}.pn-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-lo);margin-bottom:8px;}.pn-title{font-family:var(--sans);font-size:14px;color:var(--text-hi);line-height:1.35;font-weight:400;}.pn-item.right{text-align:right;}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:20px 52px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10px;color:var(--text-lo);}
+@media(max-width:700px){nav{padding:0 18px;}.article-wrap{padding:90px 20px 60px;}.data-table{font-size:11px;}footer{padding:16px 20px;flex-direction:column;gap:8px;}.post-nav{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="cur"></div><div id="cur-ring"></div>
+<nav><a class="logo" href="../index.html"><em>~/</em>shreya-k</a><a class="nav-back" href="../index.html#blog">← Back to site</a></nav>
+<div class="article-wrap">
+  <div class="art-kicker">Robot Learning · Contact-Rich Manipulation · MuJoCo</div>
+  <h1 class="art-title">Residual SAC for Vision-Guided Keyed Peg Insertion</h1>
+  <div class="art-meta"><span>2026</span><span>Shreya Kalyanaraman</span><span>~8 min read</span></div>
+  <div class="art-hr"></div>
+  <div class="prose">
+    <p>This report studies simulated keyed peg-in-hole insertion in MuJoCo under large reset uncertainty and tight geometric tolerance. The peg starts grasped, the socket pose is randomized by up to ±5 cm, and the policy outputs normalized delta actions <code>[dx, dy, dz, dyaw]</code>. The main comparison uses 0.5 mm per-side clearance.</p>
+    <p>The implementation builds on SERL's off-policy RL infrastructure for actor-critic training, replay buffers, demonstration replay, checkpointing, and deterministic evaluation. The task environment, visual-pose predictor, wrist force-torque observation, scripted demonstrations, and residual action wrapper are project-specific.</p>
+
+    <h2>Problem Setting</h2>
+    <p>Tight-clearance insertion is a contact-control problem. Coarse alignment is relatively easy; success depends on the last few millimeters, where small xy or yaw errors can produce wall contact, wedging, and rapidly increasing force.</p>
+    <p>This motivates the BC-plus-residual structure used here. Demonstrations provide the nominal alignment and descent behavior, while the residual policy learns bounded closed-loop corrections during contact. An episode succeeds when the peg reaches 25 mm insertion depth while satisfying alignment and force constraints; failures are logged as timeout, bad alignment, high-force termination, jamming, peg slip, workspace violation, or robot error.</p>
+
+    <h2>Policy Inputs and Action</h2>
+    <p>The policy does not operate directly on raw camera images. Instead, perception is handled separately from control: a supervised visual pose predictor maps wrist and side RGB images to a compact task state consisting of relative xy error, yaw error, and insertion depth. This separation gives the policy a low-dimensional, task-centric observation and confines the pixel-to-geometry mapping to a single module trained with standard supervision.</p>
+
+    <p>The two cameras serve different roles. The wrist camera observes the peg-socket interface closely but is prone to occlusion near contact, while the side camera provides broader geometric context. Contact itself is not reliably visible from either view at these clearances, so the force-torque signal carries the contact information and the predictor is responsible only for geometry.</p>
+
+    <p>Predictor accuracy matters at these tolerances. On 5,000 held-out sampled transitions, the predictor reaches 0.33 mm xy MAE, 0.81 mm xy p95, 0.07° yaw MAE, and 0.10 mm depth MAE. At 0.25 to 0.5 mm clearance, these xy errors are comparable to the clearance scale, so the policy operates under non-negligible estimation error. The residual policy trains against the predictor's actual outputs rather than ground truth, so its corrections are learned under this error distribution; an oracle-pose comparison remains future work.</p>
+
+    <table class="data-table">
+      <thead><tr><th>Component</th><th>Signal</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>Vision</td><td>wrist RGB + side RGB</td><td>inputs to the supervised pose predictor, not directly observed by the policy</td></tr>
+        <tr><td>Compact visual pose</td><td>relative xy error, yaw error, insertion depth</td><td>geometric task context</td></tr>
+        <tr><td>Robot state</td><td>proprioception + wrist F/T</td><td>local contact state</td></tr>
+        <tr><td>Action</td><td><code>[dx, dy, dz, dyaw]</code></td><td>normalized delta command, 2 mm Cartesian scale</td></tr>
+      </tbody>
+    </table>
+
+    <p>Actions are normalized deltas over Cartesian position and yaw, with a 2 mm per-step Cartesian scale. This bound limits how far any single command can displace the peg during contact, which caps the damage of a bad action and keeps online exploration near the nominal trajectory once the residual policy is introduced.</p>
+
+    <h2>Method</h2>
+    <p>The final controller combines a frozen behavior-cloned base policy with a Residual SAC correction. The base policy supplies the nominal insertion action; the residual policy observes the same compact state along with the base action and outputs a bounded correction.</p>
+
+    <div class="diagram">
+      side + wrist cameras, proprioception, wrist F/T<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      visual pose predictor → compact task features<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      BC base policy → nominal action<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;+<br>
+      Residual SAC → bounded contact correction<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+      final action = clip(base action + 0.10 × residual action)
+    </div>
+
+    <p>Freezing the base is deliberate. Naive actor-critic fine-tuning of a supervised initialization can degrade pretrained behavior early in training, when actor updates follow gradients from a still-unreliable critic. Freezing the base bounds this risk: the controller can never depart from BC behavior by more than the residual limit. The residual bound plays the complementary role during exploration, limiting how far online rollouts can stray from the nominal insertion trajectory.</p>
+
+    <h2>Main Evaluation</h2>
+    <p>The primary comparison isolates the effect of residual online RL over a fixed demonstration prior. It compares a frozen BC policy against Residual SAC on the 0.5 mm-clearance keyed insertion task with static fixture pose during each episode and randomized reset pose. Results are averaged over three evaluation seeds with 100 deterministic episodes per seed, using the same reset distribution, success condition, force thresholds, and episode horizon for both methods. This is evaluation-seed variation for a fixed trained checkpoint, not a retraining sweep.</p>
+
+    <table class="data-table">
+      <thead><tr><th>Method</th><th>Success</th><th>Max Force</th><th>Steps</th><th>Max Depth</th><th>High Force / Jam<br>(per 100 eps)</th></tr></thead>
+      <tbody>
+        <tr><td class="base">BC</td><td>23.7 ± 5.5%</td><td>41.7 ± 1.3 N</td><td>183.4 ± 6.1</td><td>11.0 ± 1.1 mm</td><td>43.7 / 20.3</td></tr>
+        <tr><td class="win">Residual SAC</td><td>76.3 ± 4.0%</td><td>17.0 ± 0.9 N</td><td>154.5 ± 3.2</td><td>22.8 ± 0.3 mm</td><td>14.3 / 3.0</td></tr>
+      </tbody>
+    </table>
+
+
+    <p>Residual SAC raises success by 52.6 percentage points relative to the frozen BC base under the same evaluation protocol. The improvement is accompanied by lower peak force, shorter episodes, greater insertion depth, and fewer high-force or jam terminations. Because force is threshold-censored by safety termination, the force result should be interpreted as reduced incidence of force-limited failures rather than an unconstrained contact-force measurement.</p>
+
+    <p>A preliminary single-seed clearance sweep produced the same qualitative ordering at 1.0 mm, 0.5 mm, and 0.25 mm clearances. Those values are treated as diagnostic unless repeated with multiple evaluation seeds.</p>
+
+
+    <h2>Qualitative Rollouts</h2>
+    <p>The videos are grouped by role: the matched BC versus Residual SAC comparison, the residual-policy training progression, and diagnostic clips for failure and stress cases. Some videos contain the text <code>sac_eval</code> because they were rendered by the same evaluation script; the labels below each clip give the actual method and checkpoint.</p>
+
+    <h3>Main Evaluation</h3>
+    <div class="video-grid">
+      <div class="vid-card">
+        <div class="vid-title">1. BC baseline · main task</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/bc_main_seed31005.mp4"></video>
+        <div class="vid-caption">Frozen behavior cloning policy at 0.5 mm clearance. This is the baseline policy in the main BC versus Residual SAC comparison.</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-title">2. Residual SAC · main task</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/residual_main_seed31005.mp4"></video>
+        <div class="vid-caption">Residual SAC at the same 0.5 mm clearance. The executed action is the BC action plus a bounded learned correction.</div>
+      </div>
+    </div>
+
+    <h3>Residual SAC Training Progression</h3>
+    <div class="video-grid">
+      <div class="vid-card">
+        <div class="vid-title">3. Residual SAC · step 0</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/residual_progress_step0.mp4"></video>
+        <div class="vid-caption">Residual policy before online improvement. This shows the starting behavior around the frozen BC base.</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-title">4. Residual SAC · 40k updates</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/residual_progress_step40k.mp4"></video>
+        <div class="vid-caption">Intermediate checkpoint. The correction policy has begun changing the contact phase but is not the selected final checkpoint.</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-title">5. Residual SAC · 90k updates</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/residual_progress_step90k.mp4"></video>
+        <div class="vid-caption">Selected checkpoint used for the seeded main evaluation.</div>
+      </div>
+    </div>
+
+    <h3>Failure and Diagnostics</h3>
+    <div class="video-grid">
+      <div class="vid-card">
+        <div class="vid-title">6. Jam / high-force failure</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/jam_failure_example.mp4"></video>
+        <div class="vid-caption">Representative tight-clearance failure. The clip illustrates the contact mode that the residual policy is intended to reduce.</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-title">7. Raw-image DrQ/SAC diagnostic</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/drq_negative_baseline.mp4"></video>
+        <div class="vid-caption">Raw-image DrQ/SAC diagnostic. Under the tested budget, this run did not reliably discover the insertion phase.</div>
+      </div>
+      <div class="vid-card">
+        <div class="vid-title">8. Residual SAC · stress test</div>
+        <video controls muted loop playsinline preload="metadata" src="../assets/peg-insertion/residual_stress_5mm_seed31005.mp4"></video>
+        <div class="vid-caption">5 mm mid-episode fixture perturbation. This clip is qualitative and is not included in the main result table.</div>
+      </div>
+    </div>
+
+    <h2>Control Structure Check</h2>
+    <p>The main ablation compares three controllers that use the same compact visual-pose observation. The question is whether online SAC should output the entire action directly or only a bounded correction around the cloned policy.</p>
+
+    <table class="data-table">
+      <thead><tr><th>Controller</th><th>Action Form</th><th>Success</th><th>Max Force</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td class="base">BC</td><td><code>a = π_BC(o)</code></td><td>23.7 ± 5.5%</td><td>41.7 ± 1.3 N</td><td>demonstrations provide a useful prior but fail often near contact</td></tr>
+        <tr><td>Demo-augmented SAC</td><td><code>a = π_SAC(o)</code></td><td>48.7 ± 5.8%</td><td>18.8 ± 0.5 N</td><td>online RL with demo replay improves over BC, but remains below residual control</td></tr>
+        <tr><td class="win">Residual SAC</td><td><code>a = π_BC(o) + 0.10 · π_res(o, π_BC(o))</code></td><td>76.3 ± 4.0%</td><td>17.0 ± 0.9 N</td><td>best success under matched static-fixture evaluation</td></tr>
+      </tbody>
+    </table>
+
+    <p>Separately, a raw-image DrQ/SAC diagnostic reached 0% success after 20k updates in a single-seed run. I treat that as a compute-limited diagnostic rather than a matched ablation, because it changes both the observation pipeline and the training budget.</p>
+
+    <h2>Prior Work and Design Choices</h2>
+    <p>This project borrows ideas from four papers; it does not reproduce any of them directly. The task framing comes from <a href="https://arxiv.org/abs/1906.05841" target="_blank" rel="noopener">Schoettler, Nair et al. (2019)</a>, who studied connector insertion on a real robot. Their starting point is the same one this project begins from: insertion is dominated by contact and friction, the robot never has perfect state information, and RL becomes practical only when it starts from some prior structure, such as a controller or demonstrations, rather than from scratch. They also identify why residual control is a natural fit for insertion: the prior handles the gross motion of reaching and aligning, so RL only needs to learn small corrective feedback during descent, which is the part that is hard to specify by hand. Their prior was a hand-tuned P-controller; replacing it with a learned policy is where the other papers become relevant.</p>
+
+    <p>The residual setup itself comes from <a href="https://arxiv.org/abs/1812.06298" target="_blank" rel="noopener"><em>Residual Policy Learning</em></a> (Silver et al., 2018): keep an initial policy fixed and learn an additive correction on top of it. Two of their findings shaped this implementation. First, the learner should initially behave like the base policy, so training starts from a working controller rather than random behavior; here, the residual bound keeps early actions close to the BC policy's actions. Second, they observed that when an actor is trained against a value function that has not yet learned a useful estimate, performance can degrade before it improves. They addressed this by training the critic alone for a warm-up period. I take the more conservative route of freezing the base policy entirely: the critic can no longer damage what BC learned, although the final controller is limited to corrections around it.</p>
+
+    <p><a href="https://arxiv.org/abs/2407.16677" target="_blank" rel="noopener"><em>ResiP</em></a> (Ankile et al., 2024) supplies the specific BC-plus-residual structure. Their observation is that imitation learning can produce a good nominal assembly policy that still fails at the precision bottleneck, where success depends on closed-loop correction rather than reproducing a trajectory. That is how the BC baseline fails here: it reaches the socket reliably, then often jams. The residual scale of 0.10 is also taken from their design space; their sweep found performance robust across a wide range of scales when exploration noise was adjusted accordingly, so I use 0.10 as a reasonable default rather than tuning it for this environment. The substantive difference is the training recipe. ResiP trains its residual with on-policy PPO across many parallel simulators and tens of millions of environment steps; this project uses demo-augmented off-policy SAC and reaches its reported result in tens of thousands of single-environment steps.</p>
+
+    <p><a href="https://arxiv.org/abs/2506.17564" target="_blank" rel="noopener">Dodeja et al. (2025)</a> motivates the final design detail: the residual policy observes the base policy's action, so it corrects a known command instead of inferring that command from state alone. Their larger contribution, using the base policy's uncertainty to decide when the residual should act, is not implemented here. This project only tests whether residual control helps under the fixed residual-bound design. Uncertainty-gated residual control is a natural next experiment, with one caveat from their results: gating can fail when the base policy is confident and wrong, which is plausible for a BC policy in states far from its demonstrations.</p>
+
+    <h2>Scope</h2>
+    <p>The current result supports a scoped claim: in this simulated fixed-geometry keyed insertion task, Residual SAC improves a BC base policy by learning bounded contact-sensitive corrections. The result does not establish real-robot transfer, shape generalization, or robustness across independently trained seeds.</p>
+
+    <div class="callout"><div class="cl">Summary</div>
+      Residual SAC preserves the useful nominal behavior of behavior cloning while reducing contact failures through bounded corrections near insertion. The main completed result is the static-fixture BC versus Residual SAC comparison under matched evaluation conditions.
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:36px">
+      <span class="chip">Residual SAC</span><span class="chip">Behavior Cloning</span><span class="chip">Peg Insertion</span><span class="chip">Contact-Rich Manipulation</span><span class="chip">MuJoCo</span><span class="chip">SERL</span>
+    </div>
+  </div>
+  <nav class="post-nav">
+    <a class="pn-item" href="vla-limits.html"><div class="pn-label">← Related</div><div class="pn-title">What Dexterous Manipulation Actually Needs</div></a>
+    <a class="pn-item right" href="tmi.html"><div class="pn-label">Also →</div><div class="pn-title">TMI: Teaching OpenVLA to Ignore the Fluff</div></a>
+  </nav>
+</div>
+<footer><span>© 2026 Shreya Kalyanaraman</span><a href="../index.html" style="color:var(--gold);text-decoration:none;">← Back to portfolio</a></footer>
+<script>
+const c=document.getElementById('cur'),r=document.getElementById('cur-ring');let mx=0,my=0,rx=0,ry=0;document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.left=mx-4+'px';c.style.top=my-4+'px';});(function l(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx-16+'px';r.style.top=ry-16+'px';requestAnimationFrame(l);})();document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>{c.style.transform='scale(2.5)';r.style.borderColor='rgba(212,168,83,.65)';});el.addEventListener('mouseleave',()=>{c.style.transform='scale(1)';r.style.borderColor='rgba(212,168,83,.28)';});});
+</script>
+</body>
+</html>
